@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Added for navigation
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Utensils, Clock, Pizza, Coffee, Leaf } from 'lucide-react';
 import Footer from "./Footer";
 import ChatBot from "./AI/chatbot";
+
 
 const CanteenHomepage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -19,7 +20,6 @@ const CanteenHomepage = () => {
   const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % images.length);
   const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
 
-  // Updated with 'path' properties for routing
   const categories = [
     { 
       name: "Juice Bar", 
@@ -89,13 +89,17 @@ const CanteenHomepage = () => {
             <p className="text-xl text-white/90 mb-8 font-medium max-w-xl">
               Pre-order your favorite campus meals and pick them up when they're ready.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap justify-center">
               <button className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2">
                 <Utensils className="w-5 h-5" /> Order Now
               </button>
-              <button className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
-                <Clock className="w-5 h-5" /> Track Order
-              </button>
+
+              {/* FIXED: Changed from /BulkOrder to /bulk-order */}
+              <Link to="/bulk-order">
+                <button className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
+                  <Clock className="w-5 h-5" /> Bulk Order
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -113,13 +117,11 @@ const CanteenHomepage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category, index) => (
-            /* Using Link instead of div to enable navigation */
             <Link
               key={index}
               to={category.path}
               className="group relative h-80 rounded-2xl overflow-hidden shadow-lg cursor-pointer transition-transform duration-300 hover:-translate-y-2 block"
             >
-              {/* Background Image Container with Zoom effect */}
               <div 
                 className="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
                 style={{
@@ -128,8 +130,6 @@ const CanteenHomepage = () => {
                   backgroundPosition: 'center'
                 }}
               />
-
-              {/* Card content aligned to bottom */}
               <div className="relative h-full p-8 flex flex-col justify-end z-10">
                 <div className={`${category.color} mb-4 bg-white/95 w-12 h-12 flex items-center justify-center rounded-xl group-hover:bg-white transition-colors`}>
                   {category.icon}

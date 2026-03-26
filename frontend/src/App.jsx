@@ -21,6 +21,8 @@ import HomePage from "./components/HomePage"
 import ContactPage from "./components/ContactPage";
 import FaqPage from "./components/FaqPage";
 import AboutUsPage from "./components/AboutUsPage";
+import BulkOrderPage from "./components/BulkPages/BulkOrderPage";
+import MealSelectionPage from "./components/BulkPages/MealSelectionPage";
 
 
 import { useAuthStore } from "./store/user";
@@ -125,6 +127,11 @@ function App() {
         <Route path="/FaqPage" element={<FaqPage />} />
         <Route path="/AboutUsPage" element={<AboutUsPage />} />
         
+        {/* BULK ORDER ROUTE - ADDED */}
+                <Route path="/bulk-order" element={<BulkOrderPage />} />
+
+                
+                <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
 
 
         {/* Customer Routes */}
