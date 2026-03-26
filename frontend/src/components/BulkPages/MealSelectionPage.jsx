@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { ShoppingBag, Check, ArrowLeft, User, Mail, Coffee, Pizza, Leaf, Utensils, Clock } from 'lucide-react';
+import { ShoppingBag, Check, ArrowLeft, User, Mail, Coffee, Pizza, Leaf, Utensils, Clock, Crown, Star } from 'lucide-react';
 
 const MealSelectionPage = () => {
   const navigate = useNavigate();
@@ -13,10 +13,12 @@ const MealSelectionPage = () => {
   const [menu, setMenu] = useState([]);
   const [members, setMembers] = useState([]);
   const [selectedMeals, setSelectedMeals] = useState({});
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
 
   useEffect(() => {
     fetchGroupData();
     fetchMenu();
+    fetchSubscriptionInfo();
   }, [groupId]);
 
   const fetchGroupData = async () => {
@@ -48,6 +50,21 @@ const MealSelectionPage = () => {
     } catch (error) {
       console.error('Error fetching menu:', error);
       toast.error('Failed to load menu');
+    }
+  };
+
+  const fetchSubscriptionInfo = async () => {
+    try {
+      // Get current user's subscription status from localStorage or API
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user && user.id) {
+        const response = await axios.get(`http://localhost:5000/api/subscription/${user.id}`);
+        setSubscriptionInfo(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+      // Set default if no subscription
+      setSubscriptionInfo({ hasPriority: false, plan: 'base' });
     }
   };
 
@@ -85,13 +102,34 @@ const MealSelectionPage = () => {
       }
       
       toast.success('All meals selected successfully!');
-      navigate(`/bulk-order/dashboard?groupId=${groupId}`);
+      
+      // Navigate to token generation page with group and member data
+      navigate('/tokens', { 
+        state: { 
+          eventDetails: {
+            id: groupId,
+            name: groupInfo?.name,
+            date: groupInfo?.eventDate,
+            leader: groupInfo?.leader
+          },
+          members: members.map(member => ({
+            ...member,
+            selectedMeal: selectedMeals[member.email]
+          })),
+          groupInfo: groupInfo,
+          hasPriority: subscriptionInfo?.hasPriority || false
+        } 
+      });
     } catch (error) {
       console.error('Error submitting selections:', error);
       toast.error('Failed to submit selections');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const navigateToSubscription = () => {
+    navigate('/subscription');
   };
 
   const getMealIcon = (category) => {
@@ -127,6 +165,18 @@ const MealSelectionPage = () => {
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-2">🍽️ Meal Selection</h1>
           <p className="text-gray-600">Each member can choose their preferred meal</p>
+          
+          {/* Priority Preparation Banner for Subscribed Users */}
+          {subscriptionInfo?.hasPriority && (
+            <div className="mt-4 max-w-md mx-auto bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl px-6 py-3 shadow-lg">
+              <div className="flex items-center justify-center gap-2">
+                <Star className="w-5 h-5 fill-current" />
+                <span className="font-semibold">⭐ Priority Preparation Active</span>
+                <Star className="w-5 h-5 fill-current" />
+              </div>
+              <p className="text-sm text-center mt-1">Your meals will be cooked first with express pickup!</p>
+            </div>
+          )}
           
           {/* Group Info Card */}
           {groupInfo && (
@@ -196,10 +246,22 @@ const MealSelectionPage = () => {
                 })}
               </div>
               
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-4 border-t border-gray-200 space-y-3">
                 <div className="mb-3 text-sm text-gray-600">
                   <span className="font-semibold">{Object.keys(selectedMeals).length}</span> of {members.length} members have selected
                 </div>
+                
+                {/* Subscription Upgrade Button */}
+                {!subscriptionInfo?.hasPriority && (
+                  <button
+                    onClick={navigateToSubscription}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all text-sm flex items-center justify-center gap-2"
+                  >
+                    <Crown className="w-4 h-4" />
+                    Upgrade to Pro for Priority Preparation
+                  </button>
+                )}
+                
                 <button
                   onClick={handleSubmitSelections}
                   disabled={submitting || Object.keys(selectedMeals).length !== members.length}
@@ -257,6 +319,17 @@ const MealSelectionPage = () => {
                   </select>
                 </div>
 
+                {/* Priority Info Badge */}
+                {subscriptionInfo?.hasPriority && (
+                  <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-center gap-3">
+                    <div className="text-2xl">⚡</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-yellow-800">Priority Preparation Active</p>
+                      <p className="text-sm text-yellow-700">Your meals will be cooked first with express pickup service</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Member Meal Selection Cards */}
                 <div className="space-y-8">
                   {members.map((member, idx) => (
@@ -271,7 +344,15 @@ const MealSelectionPage = () => {
                     >
                       <div className="flex items-center justify-between mb-4 pb-3 border-b">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-800">{member.name}</h3>
+                          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            {member.name}
+                            {subscriptionInfo?.hasPriority && member.isPriority && (
+                              <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <Star className="w-3 h-3 fill-current" />
+                                Priority
+                              </span>
+                            )}
+                          </h3>
                           <p className="text-sm text-gray-500">{member.email}</p>
                         </div>
                         {selectedMeals[member.email] && (

@@ -23,6 +23,8 @@ import FaqPage from "./components/FaqPage";
 import AboutUsPage from "./components/AboutUsPage";
 import BulkOrderPage from "./components/BulkPages/BulkOrderPage";
 import MealSelectionPage from "./components/BulkPages/MealSelectionPage";
+import SubscriptionPage from "./components/BulkPages/SubscriptionPage";
+import TokenGenerationPage from "./components/BulkPages/TokenGenerationPage";
 
 
 import { useAuthStore } from "./store/user";
@@ -132,6 +134,9 @@ function App() {
 
                 
                 <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
+
+              <Route path="/tokens" element={<TokenGenerationPage />} />
+                <Route path="/subscription" element={<SubscriptionPage />} />
 
 
         {/* Customer Routes */}

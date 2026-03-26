@@ -1,0 +1,109 @@
+.subscription-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.priority-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.priority-icon {
+  font-size: 40px;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin: 40px 0;
+}
+
+.plan-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.pro-plan {
+  border: 2px solid #ff9800;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffffff 100%);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #ff9800;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.price {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 20px 0;
+}
+
+.features {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.feature {
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.subscribe-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.pro-btn {
+  background: #ff9800;
+  color: white;
+}
+
+.pro-btn:hover {
+  background: #f57c00;
+  transform: scale(1.05);
+}
+
+.current-plan-badge {
+  background: #4CAF50;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.priority-event {
+  border-left: 4px solid #ff9800;
+  background: #fff5e6;
+}
