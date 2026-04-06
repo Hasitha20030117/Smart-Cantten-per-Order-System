@@ -66,7 +66,7 @@ const ForgotPassword = () => {
         {/* Close Button */}
         <button
           onClick={closeToHome}
-          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all duration-200"
         >
           <X className="h-6 w-6" />
         </button>
@@ -92,7 +92,7 @@ const ForgotPassword = () => {
                       className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:outline-none transition-all duration-200 ${
                         error
                           ? "border-red-400 focus:border-red-500"
-                          : "border-gray-200 focus:border-yellow-400"
+                          : "border-gray-200 focus:border-orange-500"
                       }`}
                     />
                   </div>
@@ -101,7 +101,7 @@ const ForgotPassword = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-800 font-bold py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg"
                   >
                     {isLoading ? "Sending..." : "Send Reset Link"}
                   </button>
@@ -109,6 +109,7 @@ const ForgotPassword = () => {
               </>
             ) : (
               <div className="mt-4">
+                {/* Note: I kept the checkmark green as it universally signifies 'success', but you can change 'bg-green-500' to 'bg-orange-500' if you want a strictly monochromatic theme! */}
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-white" />
                 </div>
@@ -124,7 +125,7 @@ const ForgotPassword = () => {
           <button
             type="button"
             onClick={() => navigate("/login")}
-            className="text-yellow-600 hover:underline text-sm font-medium flex items-center gap-1"
+            className="text-orange-600 hover:text-orange-700 hover:underline text-sm font-medium flex items-center gap-1 transition-colors"
           >
             ← Back to Login
           </button>
