@@ -90,12 +90,12 @@ const CanteenHomepage = () => {
               Pre-order your favorite campus meals and pick them up when they're ready.
             </p>
             <div className="flex gap-4">
-              <button className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2">
+              <Link to="/canteen" className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2">
                 <Utensils className="w-5 h-5" /> Order Now
-              </button>
-              <button className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
+              </Link>
+              <Link to="/canteen/my-payments" className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
                 <Clock className="w-5 h-5" /> Track Order
-              </button>
+              </Link>
             </div>
           </div>
         </div>

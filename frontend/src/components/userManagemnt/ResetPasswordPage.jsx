@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { X, Lock, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "../../lib/axios";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -39,11 +39,7 @@ const ResetPassword = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post(
-        `http://localhost:8070/user/reset-password/${token}`,
-        { password },
-        { withCredentials: true }
-      );
+      const response = await axios.post(`/user/reset-password/${token}`, { password });
       setIsSuccess(true);
       toast.success(response.data.message || "Password reset successfully!");
     } catch (err) {
