@@ -1,7 +1,10 @@
+/* TokenGenerationPage.css */
 .token-generation-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .token-header {
@@ -9,18 +12,45 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #eee;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.token-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 28px;
 }
 
 .download-all-btn {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.download-all-btn:hover {
+  transform: translateY(-2px);
+}
+
+.event-summary {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.event-summary h3 {
+  margin: 0 0 10px 0;
+  color: #667eea;
 }
 
 .tokens-grid {
@@ -31,11 +61,16 @@
 }
 
 .token-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 20px;
   background: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.token-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
 }
 
 .token-header-section {
@@ -43,6 +78,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.token-header-section h4 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
 }
 
 .token-id {
@@ -51,11 +94,26 @@
   border-radius: 5px;
   font-family: monospace;
   font-size: 12px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.token-details {
+  margin-bottom: 15px;
+}
+
+.token-details p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 14px;
 }
 
 .qr-code {
   text-align: center;
   margin: 15px 0;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 10px;
 }
 
 .qr-code img {
@@ -65,11 +123,29 @@
 
 .download-token-btn {
   width: 100%;
-  background: #2196F3;
+  background: #4CAF50;
   color: white;
-  padding: 8px;
+  padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.download-token-btn:hover {
+  background: #45a049;
+}
+
+@media (max-width: 768px) {
+  .token-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .tokens-grid {
+    grid-template-columns: 1fr;
+  }
 }
