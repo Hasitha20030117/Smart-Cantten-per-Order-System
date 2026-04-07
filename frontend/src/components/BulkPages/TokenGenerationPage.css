@@ -1,10 +1,8 @@
-/* TokenGenerationPage.css */
 .token-generation-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #fffaf5; /* Subtle warm background tint */
 }
 
 .token-header {
@@ -12,45 +10,24 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ffe0b2; /* Light orange border */
 }
 
-.token-header h1 {
-  margin: 0;
-  color: #333;
-  font-size: 28px;
-}
-
+/* Changed from Green to a Primary Orange */
 .download-all-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ff9800; 
   color: white;
-  padding: 12px 24px;
+  padding: 10px 200px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  font-weight: 600;
-  transition: transform 0.2s;
+  transition: background 0.3s ease;
 }
 
 .download-all-btn:hover {
-  transform: translateY(-2px);
-}
-
-.event-summary {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.event-summary h3 {
-  margin: 0 0 10px 0;
-  color: #667eea;
+  background: #f57c00; /* Darker orange on hover */
 }
 
 .tokens-grid {
@@ -61,16 +38,11 @@
 }
 
 .token-card {
-  background: white;
-  border-radius: 15px;
+  border: 1px solid #ffcc80; /* Soft orange border */
+  border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
-
-.token-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+  background: white;
+  box-shadow: 0 4px 6px rgba(255, 152, 0, 0.1); /* Slight orange glow */
 }
 
 .token-header-section {
@@ -78,42 +50,24 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.token-header-section h4 {
-  margin: 0;
-  color: #333;
-  font-size: 18px;
 }
 
 .token-id {
-  background: #f0f0f0;
+  background: #fff3e0; /* Very light orange background */
+  color: #e65100;      /* Deep orange text */
   padding: 5px 10px;
   border-radius: 5px;
   font-family: monospace;
   font-size: 12px;
-  font-weight: 600;
-  color: #667eea;
-}
-
-.token-details {
-  margin-bottom: 15px;
-}
-
-.token-details p {
-  margin: 8px 0;
-  color: #666;
-  font-size: 14px;
+  font-weight: bold;
 }
 
 .qr-code {
   text-align: center;
   margin: 15px 0;
   padding: 10px;
-  background: #f9f9f9;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 8px;
 }
 
 .qr-code img {
@@ -121,31 +75,19 @@
   height: 120px;
 }
 
+/* Changed from Blue to a Secondary Orange/Amber */
 .download-token-btn {
   width: 100%;
-  background: #4CAF50;
+  background: #fb8c00;
   color: white;
-  padding: 10px;
+  padding: 8px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.2s;
+  margin-top: 10px;
+  font-weight: 500;
 }
 
 .download-token-btn:hover {
-  background: #45a049;
-}
-
-@media (max-width: 768px) {
-  .token-header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-  
-  .tokens-grid {
-    grid-template-columns: 1fr;
-  }
+  background: #ef6c00;
 }

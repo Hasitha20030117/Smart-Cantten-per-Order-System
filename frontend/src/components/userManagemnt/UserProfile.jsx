@@ -20,6 +20,7 @@ import {
   Edit,
   ShoppingBag,
   RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import axios from "axios";
 import { useAuthStore } from "../../store/user";
@@ -38,6 +39,8 @@ const UserProfile = () => {
   const [editingOrder, setEditingOrder] = useState(null);
   const [orderFormData, setOrderFormData] = useState({});
   const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -373,7 +376,7 @@ const UserProfile = () => {
         </div>
       )}
 
-      {error && (
+{error && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-20 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
           <AlertCircle className="h-5 w-5" />
           <span>{error}</span>
@@ -383,6 +386,50 @@ const UserProfile = () => {
           >
             <X className="h-4 w-4" />
           </button>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="text-center mb-8">
+              <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="h-12 w-12 text-red-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Delete Account</h3>
+              <p className="text-gray-600 mb-4">
+                This action cannot be undone. This will permanently delete your account and all data.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setDeleteLoading(true);
+                  try {
+                    await axios.delete(`http://localhost:8070/user/deleteUser/${user._id}`, { withCredentials: true });
+                    useAuthStore.getState().logout();
+                    navigate('/');
+                  } catch (err) {
+                    setError('Delete failed. Try again.');
+                  } finally {
+                    setDeleteLoading(false);
+                    setShowDeleteModal(false);
+                  }
+                }}
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium disabled:opacity-50"
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -575,13 +622,20 @@ const UserProfile = () => {
               )}
 
               {!editMode && (
-                <div className="mt-6 flex justify-center">
+                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={() => setEditMode(true)}
-                    className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-800 font-semibold px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+                    className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-800 font-semibold px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg flex-1 sm:flex-none"
                   >
                     <Edit3 className="h-5 w-5" />
                     <span>Edit Profile</span>
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg flex-1 sm:flex-none"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                    <span>Delete Account</span>
                   </button>
                 </div>
               )}
