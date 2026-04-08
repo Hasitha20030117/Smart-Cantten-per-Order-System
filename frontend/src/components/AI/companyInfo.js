@@ -1,163 +1,68 @@
+
+// COMPLETE NEW CANTEEN CONTEXT FOR AI
 export const companyInfo = {
-  // Basic Company Info
-  name: "Yong Smart",
-  owner: "Mrs. Ramanayake",
-  description:
-    "Yong Smart is an online and physical clothing store offering ready-made and customized clothing tailored to individual customer specifications.",
+  name: "Smart Canteen Per-Order System",
+  owner: "Campus Food Services",
+  description: "Smart Canteen is a pre-order system for campus food. Skip the queue - order ahead from multiple canteen locations and pickup when ready. Features bulk orders for groups, subscriptions, and QR token pickup.",
 
-  // Contact Information
-  contact: {
-    address: "123 Fashion Street, Style District, New York, NY 10001",
-    phone: "+1 (555) 123-4567",
-    email: "info@yongsmart.com",
-    liveChat: "Available 24/7",
-  },
-
-  // Business Hours
-  businessHours: {
-    mondayToFriday: "9:00 AM - 8:00 PM",
-    saturday: "9:00 AM - 6:00 PM",
-    sunday: "11:00 AM - 5:00 PM",
-  },
-
-  // Social Media
-  socialLinks: {
-    facebook: "https://facebook.com/yongsmart",
-    twitter: "https://twitter.com/yongsmart",
-    instagram: "https://instagram.com/yongsmart",
-    linkedin: "https://linkedin.com/company/yongsmart",
-    tiktok: "https://tiktok.com/@yongsmart",
-  },
-
-  // Services Offered
-  services: {
-    readyMadeClothing: true,
-    customClothing: true,
-    onlineOrdering: true,
-    securePayments: true,
-    reviewsAndRatings: true,
-    shippingAndDelivery: true,
-    orderTracking: true,
-    newsletterSubscription: true,
-  },
-
-  // Payment Options
-  paymentOptions: [
-    "Credit/Debit Card",
-    "PayPal",
-    "Apple Pay",
-    "Bank Transfer",
-    "Cash on Delivery",
-  ],
-  currenciesSupported: ["LKR", "USD", "EUR"],
-
-  // User Management
-  userManagement: {
-    registration: true,
-    login: true,
-    googleLogin: true,
-    otpVerification: true,
-    profileUpdate: true,
-    deleteAccount: true,
-    adminViewAllUsers: true,
-  },
-
-  // Product Management
-  productManagement: {
-    addProducts: true,
-    editProducts: true,
-    deleteProducts: true,
-    listProducts: true,
-    filterAndSearch: true,
-    stockTracking: true,
-    lowStockNotifications: true,
-    shoppingCart: true,
-    multipleProductAdd: true,
-    productReviews: true,
-  },
-
-  // Custom Orders
-  customOrderManagement: {
-    createOrder: true,
-    viewOrders: true,
-    updateOrder: true,
-    cancelOrder: true,
-    uploadDesignFiles: true,
-    orderStatus: ["Pending", "Processing", "Shipped", "Delivered"],
-    notifications: true,
-  },
-
-  // Feedback Management
-  feedbackManagement: {
-    submitFeedback: true,
-    viewFeedback: true,
-    categorizeFeedback: true,
-    adminReply: true,
-    notifications: true,
-    feedbackFields: ["name", "email", "rating", "comments", "category"],
-  },
-
-  // Shipping & Delivery
-  shipping: {
-    shippingOptions: ["Standard", "Express", "Overnight"],
-    trackingAvailable: true,
-    deliveryTime: {
-      standard: "3-5 business days",
-      express: "1-2 business days",
-      overnight: "Next day",
+  canteens: [
+    {
+      name: "Juice Bar",
+      description: "Freshly prepared juices and smoothies",
+      location: "Main Campus",
+      menuExamples: "Orange Juice, Mango Lassi, Watermelon Cooler"
     },
-    shippingCosts: "Calculated at checkout",
+    {
+      name: "Basement Canteen", 
+      description: "Grab & Go fast food",
+      location: "Basement Level",
+      menuExamples: "Sandwiches, Burgers, Fries"
+    },
+    {
+      name: "New Canteen",
+      description: "Cold & Hot meals",
+      location: "New Building",
+      menuExamples: "Rice bowls, Noodles, Salads"
+    },
+    {
+      name: "Anohana Canteen",
+      description: "Healthy salads & veggie options", 
+      location: "Garden Area",
+      menuExamples: "Veggie wraps, Salads, Smoothies"
+    }
+  ],
+
+  features: {
+    preOrder: "Order ahead and pickup without queueing",
+    bulkOrder: "Group orders for events/classes (generate tokens)",
+    subscription: "Weekly meal plans",
+    tokenGeneration: "QR codes for quick pickup",
+    payment: "Online secure payments",
+    userAuth: "Register/Login/Profile management"
   },
 
-  // System Information
+  howItWorks: [
+    "1. Browse menus from all canteens",
+    "2. Add items to cart and pay online", 
+    "3. Generate QR token for pickup",
+    "4. Scan at counter - food ready!"
+  ],
+
+  contact: {
+    phone: "Call campus food services",
+    email: "canteen@campus.edu",
+    support: "Live chat or contact page"
+  },
+
+  businessHours: {
+    mondayToFriday: "8AM - 8PM",
+    weekend: "9AM - 5PM"
+  },
+
   systemInfo: {
-    availability: "24/7",
-    scalability: "Support up to 10,000 users",
-    performance: "Fast response for CRUD actions",
-    security: "Data encryption, role-based access",
-    compatibility: "Desktop, tablet, and mobile browsers",
-    backup: "Daily database backups, weekly feedback backup",
-  },
-
-  // Notifications
-  notifications: {
-    orderConfirmation: true,
-    shippingUpdates: true,
-    paymentReceipts: true,
-    lowStockAlerts: true,
-    feedbackReply: true,
-  },
-
-  // Analytics & Reporting
-  analytics: {
-    salesReports: true,
-    customerReports: true,
-    productPerformance: true,
-    feedbackReports: true,
-  },
-
-  // Promotions & Discounts
-  promotions: {
-    discountCoupons: true,
-    seasonalSales: true,
-    referralProgram: true,
-    loyaltyPoints: true,
-  },
-
-  // Security & Compliance
-  compliance: {
-    GDPR: true,
-    PCI_DSS: true,
-    SSL: true,
-    localTaxCompliance: true,
-  },
-
-  // Support
-  support: {
-    faq: true,
-    liveChat: true,
-    emailSupport: true,
-    phoneSupport: true,
-    supportHours: "9:00 AM - 8:00 PM Mon-Sat",
-  },
+    webApp: "Works on desktop/mobile",
+    routes: "/ (home), /bulk-order, /tokens, /subscription",
+    tech: "React frontend, Node.js backend"
+  }
 };
+
