@@ -21,10 +21,6 @@ import HomePage from "./components/HomePage"
 import ContactPage from "./components/ContactPage";
 import FaqPage from "./components/FaqPage";
 import AboutUsPage from "./components/AboutUsPage";
-import BulkOrderPage from "./components/BulkPages/BulkOrderPage";
-import MealSelectionPage from "./components/BulkPages/MealSelectionPage";
-import SubscriptionPage from "./components/BulkPages/SubscriptionPage";
-import TokenGenerationPage from "./components/BulkPages/TokenGenerationPage";
 import CanteenLanding from "./pages/canteen/CanteenLanding";
 import PayForToken from "./pages/canteen/PayForToken";
 import OnlinePay from "./pages/canteen/OnlinePay";
@@ -42,7 +38,6 @@ import OrdersPage from "./pages/orders/OrdersPage";
 
 
 import { useAuthStore } from "./store/user";
-import { Home } from "lucide-react";
 
 // ✅ Protected Route for Admin
 const AdminRoute = ({ children }) => {
@@ -156,15 +151,6 @@ function App() {
         <Route path="/subscription" element={<SubscriptionPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/orders/create" element={<CreateOrderPage />} />
-        
-        {/* BULK ORDER ROUTE - ADDED */}
-                <Route path="/bulk-order" element={<BulkOrderPage />} />
-
-                
-                <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
-
-              <Route path="/tokens" element={<TokenGenerationPage />} />
-                <Route path="/subscription" element={<SubscriptionPage />} />
 
         {/* Customer Routes */}
         <Route

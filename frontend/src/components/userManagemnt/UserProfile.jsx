@@ -396,7 +396,7 @@ const UserProfile = () => {
                 onClick={async () => {
                   setDeleteLoading(true);
                   try {
-                    await axios.delete(`http://localhost:8070/user/deleteUser/${user._id}`, { withCredentials: true });
+                    await axios.delete(`/user/deleteUser/${user._id}`, { withCredentials: true });
                     useAuthStore.getState().logout();
                     navigate('/');
                   } catch (err) {
