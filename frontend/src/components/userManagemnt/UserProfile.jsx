@@ -22,9 +22,9 @@ import {
   RefreshCw,
   AlertTriangle,
 } from "lucide-react";
-import axios from "axios";
 import { useAuthStore } from "../../store/user";
 import { useNavigate } from "react-router-dom";
+import axios, { API_BASE_URL } from "../../lib/axios";
 
 const UserProfile = () => {
   const { user, isAuthenticated } = useAuthStore();
@@ -66,10 +66,7 @@ const UserProfile = () => {
       setLoading(true);
 
       // Fetch user data
-      const userRes = await axios.get(
-        `http://localhost:8070/user/SelectUser/${user._id}`,
-        { withCredentials: true }
-      );
+      const userRes = await axios.get(`/user/SelectUser/${user._id}`);
 
       if (userRes.data && userRes.data.user) {
         setUserData(userRes.data.user);
@@ -101,10 +98,7 @@ const UserProfile = () => {
 
     try {
       setOrdersLoading(true);
-      const ordersRes = await axios.get(
-        `http://localhost:8070/customization/user/${user._id}`,
-        { withCredentials: true }
-      );
+      const ordersRes = await axios.get(`/customization/user/${user._id}`);
       setCustomOrders(ordersRes.data || []);
     } catch (err) {
       console.warn("Could not fetch custom orders:", err.message);
@@ -195,17 +189,13 @@ const UserProfile = () => {
 
     setLoading(true);
     try {
-      await axios.put(
-        `http://localhost:8070/user/updateUser/${user._id}`,
-        {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: formData.address,
-        },
-        { withCredentials: true }
-      );
+      await axios.put(`/user/updateUser/${user._id}`, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        address: formData.address,
+      });
 
       setUserData({
         ...userData,
@@ -272,11 +262,7 @@ const UserProfile = () => {
 
   const handleUpdateOrder = async (orderId) => {
     try {
-      const response = await axios.put(
-        `http://localhost:8070/customization/${orderId}`,
-        orderFormData,
-        { withCredentials: true }
-      );
+      const response = await axios.put(`/customization/${orderId}`, orderFormData);
 
       setCustomOrders(prev => prev.map(order => 
         order._id === orderId 
@@ -297,10 +283,7 @@ const UserProfile = () => {
     if (!window.confirm("Are you sure you want to cancel this order?")) return;
 
     try {
-      await axios.delete(
-        `http://localhost:8070/customization/${orderId}`,
-        { withCredentials: true }
-      );
+      await axios.delete(`/customization/${orderId}`);
 
       setCustomOrders(prev => prev.filter(order => order._id !== orderId));
       setUpdateSuccess(true);

@@ -6,6 +6,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import cron from "node-cron";
+import Order from "./models/Canteen/Order.js";
+import Payment from "./models/Canteen/Payment.js";
 
 dotenv.config();
 
@@ -39,6 +42,13 @@ mongoose
 
 // ========== EXISTING ROUTES ==========
 import userRoutes from "./routes/UserManagement/User.js";
+import paymentRoutes from "./routes/Canteen/paymentRoutes.js";
+import adminPaymentRoutes from "./routes/Canteen/adminPaymentRoutes.js";
+import receiptRoutes from "./routes/Canteen/receiptRoutes.js";
+import tokenRoutes from "./routes/Canteen/tokenRoutes.js";
+import bulkOrderRoutes from "./routes/Bulk/bulkOrderRoutes.js";
+import subscriptionRoutes from "./routes/Bulk/subscriptionRoutes.js";
+import orderManagementRoutes from "./routes/OrderManagement/orderRoutes.js";
 app.use("/user", userRoutes);
 
 // ========== BULK ORDERING ROUTES ==========
