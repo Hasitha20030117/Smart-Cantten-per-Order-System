@@ -21,6 +21,24 @@ import HomePage from "./components/HomePage"
 import ContactPage from "./components/ContactPage";
 import FaqPage from "./components/FaqPage";
 import AboutUsPage from "./components/AboutUsPage";
+import BulkOrderPage from "./components/BulkPages/BulkOrderPage";
+import MealSelectionPage from "./components/BulkPages/MealSelectionPage";
+import SubscriptionPage from "./components/BulkPages/SubscriptionPage";
+import TokenGenerationPage from "./components/BulkPages/TokenGenerationPage";
+import CanteenLanding from "./pages/canteen/CanteenLanding";
+import PayForToken from "./pages/canteen/PayForToken";
+import OnlinePay from "./pages/canteen/OnlinePay";
+import QrPay from "./pages/canteen/QrPay";
+import SlipPay from "./pages/canteen/SlipPay";
+import Receipt from "./pages/canteen/Receipt";
+import MyPayments from "./pages/canteen/MyPayments";
+import CanteenAdminPayments from "./pages/canteen/AdminPayments";
+import BulkOrderPage from "./pages/bulk/BulkOrderPage";
+import MealSelectionPage from "./pages/bulk/MealSelectionPage";
+import SubscriptionPage from "./pages/bulk/SubscriptionPage";
+import TokenGenerationPage from "./pages/bulk/TokenGenerationPage";
+import CreateOrderPage from "./pages/orders/CreateOrderPage";
+import OrdersPage from "./pages/orders/OrdersPage";
 
 
 import { useAuthStore } from "./store/user";
@@ -49,6 +67,7 @@ const ConditionalNavbar = () => {
   const hideNavbarRoutes = [
     "/admin/dashboard", // hide on admin dashboard
     "/profile",
+    "/canteen/admin/payments",
   ];
 
   const isResetPasswordRoute = location.pathname.startsWith("/reset-password/");
@@ -121,11 +140,31 @@ function App() {
         <Route path="/forget-password" element={<ForgotPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-         <Route path="/ContactPage" element={<ContactPage />} />
+        <Route path="/ContactPage" element={<ContactPage />} />
         <Route path="/FaqPage" element={<FaqPage />} />
         <Route path="/AboutUsPage" element={<AboutUsPage />} />
+        <Route path="/canteen" element={<CanteenLanding />} />
+        <Route path="/canteen/pay/:orderId" element={<PayForToken />} />
+        <Route path="/canteen/pay/online/:paymentId" element={<OnlinePay />} />
+        <Route path="/canteen/pay/qr/:paymentId" element={<QrPay />} />
+        <Route path="/canteen/pay/slip/:paymentId" element={<SlipPay />} />
+        <Route path="/canteen/receipt/:paymentId" element={<Receipt />} />
+        <Route path="/canteen/my-payments" element={<MyPayments />} />
+        <Route path="/bulk-order" element={<BulkOrderPage />} />
+        <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
+        <Route path="/tokens" element={<TokenGenerationPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/create" element={<CreateOrderPage />} />
         
+        {/* BULK ORDER ROUTE - ADDED */}
+                <Route path="/bulk-order" element={<BulkOrderPage />} />
 
+                
+                <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
+
+              <Route path="/tokens" element={<TokenGenerationPage />} />
+                <Route path="/subscription" element={<SubscriptionPage />} />
 
         {/* Customer Routes */}
         <Route
@@ -143,6 +182,14 @@ function App() {
           element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/canteen/admin/payments"
+          element={
+            <AdminRoute>
+              <CanteenAdminPayments />
             </AdminRoute>
           }
         />
