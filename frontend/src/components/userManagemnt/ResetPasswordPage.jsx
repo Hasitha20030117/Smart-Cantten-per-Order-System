@@ -78,7 +78,7 @@ const ResetPassword = () => {
         {/* Close Button */}
         <button
           onClick={closeToHome}
-          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+          className="absolute top-6 right-6 z-20 p-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-full transition-all duration-200"
         >
           <X className="h-6 w-6" />
         </button>

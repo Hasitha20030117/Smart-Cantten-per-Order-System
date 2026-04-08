@@ -1,0 +1,93 @@
+.token-generation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fffaf5; /* Subtle warm background tint */
+}
+
+.token-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ffe0b2; /* Light orange border */
+}
+
+/* Changed from Green to a Primary Orange */
+.download-all-btn {
+  background: #ff9800; 
+  color: white;
+  padding: 10px 200px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.download-all-btn:hover {
+  background: #f57c00; /* Darker orange on hover */
+}
+
+.tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.token-card {
+  border: 1px solid #ffcc80; /* Soft orange border */
+  border-radius: 10px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(255, 152, 0, 0.1); /* Slight orange glow */
+}
+
+.token-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.token-id {
+  background: #fff3e0; /* Very light orange background */
+  color: #e65100;      /* Deep orange text */
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.qr-code {
+  text-align: center;
+  margin: 15px 0;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.qr-code img {
+  width: 120px;
+  height: 120px;
+}
+
+/* Changed from Blue to a Secondary Orange/Amber */
+.download-token-btn {
+  width: 100%;
+  background: #fb8c00;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.download-token-btn:hover {
+  background: #ef6c00;
+}
