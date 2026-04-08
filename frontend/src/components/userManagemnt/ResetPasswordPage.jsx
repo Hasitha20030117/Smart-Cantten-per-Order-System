@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import { X, Lock, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "../../lib/axios";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -39,7 +39,11 @@ const ResetPassword = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post(`/user/reset-password/${token}`, { password });
+      const response = await axios.post(
+        `http://localhost:8070/user/reset-password/${token}`,
+        { password },
+        { withCredentials: true }
+      );
       setIsSuccess(true);
       toast.success(response.data.message || "Password reset successfully!");
     } catch (err) {
@@ -78,7 +82,7 @@ const ResetPassword = () => {
         {/* Close Button */}
         <button
           onClick={closeToHome}
-          className="absolute top-6 right-6 z-20 p-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-full transition-all duration-200"
+          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
         >
           <X className="h-6 w-6" />
         </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/user";
 import {
@@ -10,6 +10,7 @@ import {
   MapPin,
   Lock,
   X,
+  CheckCircle,
 } from "lucide-react";
 
 const Register = () => {
@@ -29,72 +30,28 @@ const Register = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const { signup, isLoading } = useAuthStore();
+  const { signup, error, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
-  
-
-  {/* Validates individual fields and updates the error state.*/}
-   
-  const validateField = (name, value, currentFormData = formData) => {
-    let message = "";
-
-    switch (name) {
-      case "firstName":
-      case "lastName":
-        if (!value.trim()) message = `${name === "firstName" ? "First" : "Last"} name is required`;
-        else if (!/^[A-Za-z\s]+$/.test(value)) message = "Only letters allowed";
-        break;
-      case "email":
-        if (!value.trim()) message = "Email is required";
-        else if (!/^\S+@\S+\.\S+$/.test(value)) message = "Please enter a valid email";
-        break;
-      case "contact":
-        if (!value.trim()) message = "Phone number is required";
-        else if (!/^\d{10}$/.test(value)) message = "Enter a valid 10-digit phone number";
-        break;
-      case "address":
-        if (!value.trim()) message = "Address is required";
-        break;
-      case "password":
-        if (value.length < 8) message = "Password must be at least 8 characters";
-        break;
-      case "confirmPassword":
-        // Compares with the password currently in state
-        if (value !== currentFormData.password) message = "Passwords do not match";
-        break;
-      default:
-        break;
-    }
-
-    setErrors((prev) => ({ ...prev, [name]: message }));
-    return message;
-  };
-
-  {/* Updates state and triggers validation/strength checks.
-   */}
+  // Handle field changes + validate while typing
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const newFormData = { ...formData, [name]: value };
-    setFormData(newFormData);
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // If password changes, re-check strength and re-validate the "Confirm" field
-    if (name === "password") {
-      checkPasswordStrength(value);
-      validateField("confirmPassword", formData.confirmPassword, newFormData);
-    }
-    
-    validateField(name, value, newFormData);
+    if (name === "password") checkPasswordStrength(value);
+    validateField(name, value);
   };
 
-  
-
+  // Prevent invalid characters while typing
   const handleKeyPress = (e, type) => {
-    if (type === "name" && !/^[a-zA-Z\s]*$/.test(e.key)) e.preventDefault();
-    if (type === "phone" && !/[0-9]/.test(e.key)) e.preventDefault();
+    if (type === "name") {
+      if (!/^[a-zA-Z\s]*$/.test(e.key)) e.preventDefault();
+    }
+    if (type === "phone") {
+      if (!/[0-9]/.test(e.key)) e.preventDefault();
+    }
   };
 
-  
   const checkPasswordStrength = (password) => {
     let strength = 0;
     if (password.length >= 8) strength += 25;
@@ -105,32 +62,55 @@ const Register = () => {
   };
 
   const getPasswordStrengthColor = () => {
-    if (passwordStrength <= 25) return "#ef4444"; // Red
-    if (passwordStrength <= 50) return "#f97316"; // Orange
-    if (passwordStrength <= 75) return "#fb923c"; // Light Orange
-    return "#10b981"; // Green
+    if (passwordStrength <= 25) return "#ef4444"; // red
+    if (passwordStrength <= 50) return "#f59e0b"; // orange
+    if (passwordStrength <= 75) return "#3b82f6"; // blue
+    return "#10b981"; // green
   };
 
-  
+  const validateField = (name, value) => {
+    let message = "";
 
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-
-    // Validate all fields in the object
-    Object.keys(formData).forEach((key) => {
-      const errorMsg = validateField(key, formData[key]);
-      if (errorMsg) isValid = false;
-    });
-
-    
-    if (!agreedToTerms) {
-      newErrors.terms = "Please accept the terms";
-      isValid = false;
+    switch (name) {
+      case "firstName":
+      case "lastName":
+        if (!value.trim())
+          message = `${name === "firstName" ? "First" : "Last"} name is required`;
+        else if (!/^[A-Za-z\s]+$/.test(value)) message = "Only letters allowed";
+        break;
+      case "email":
+        if (!value.trim()) message = "Email is required";
+        else if (!/^\S+@\S+\.\S+$/.test(value))
+          message = "Please enter a valid email";
+        break;
+      case "contact":
+        if (!value.trim()) message = "Phone number is required";
+        else if (!/^\d{10}$/.test(value))
+          message = "Enter a valid 10-digit phone number";
+        break;
+      case "address":
+        if (!value.trim()) message = "Address is required";
+        break;
+      case "password":
+        if (value.length < 8) message = "Password must be at least 8 characters";
+        break;
+      case "confirmPassword":
+        if (value !== formData.password) message = "Passwords do not match";
+        break;
+      default:
+        break;
     }
 
-    setErrors((prev) => ({ ...prev, ...newErrors }));
-    return isValid;
+    setErrors((prev) => ({ ...prev, [name]: message }));
+  };
+
+  const validateForm = () => {
+    let formErrors = {};
+    Object.keys(formData).forEach((key) => validateField(key, formData[key]));
+    if (!agreedToTerms) formErrors.terms = "Please accept the terms";
+    setErrors((prev) => ({ ...prev, ...formErrors }));
+
+    return Object.values(formErrors).every((e) => !e);
   };
 
   const handleSignUp = async (e) => {
@@ -149,15 +129,16 @@ const Register = () => {
       );
       navigate("/verify-email");
     } catch (err) {
-      console.error("Signup failed:", err);
+      console.log(err);
     }
   };
 
   const closeToHome = () => navigate("/");
+  const stop = (e) => e.stopPropagation();
 
   return (
-    <div className="fixed inset-0 flex z-50 bg-gray-100" onClick={closeToHome}>
-      {/* Left Branding Side */}
+    <div className="fixed inset-0 flex z-50" onClick={closeToHome}>
+      {/* Left Side (Background + Overlay) */}
       <div className="hidden lg:flex lg:w-3/5 relative">
         <img
           src="/images/5.jpg"
@@ -168,53 +149,89 @@ const Register = () => {
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-8">
           <h1 className="text-4xl font-bold mb-4">Welcome to Our Platform</h1>
           <p className="max-w-md text-gray-300">
-            Create your account today to enjoy cashless payments and pre-order your favorite meals.
+            "Create your account today to enjoy cashless payments, skip the long queues, and pre-order your favorite meals from anywhere.
           </p>
         </div>
       </div>
 
-      {/* Right Form Side */}
+      {/* Right Side (Form Panel) */}
       <aside
-        onClick={(e) => e.stopPropagation()}
+        onClick={stop}
         className="w-full lg:w-2/5 bg-white flex flex-col relative overflow-y-auto p-6 sm:p-8 shadow-2xl"
       >
+        {/* Close Button */}
         <button
           onClick={closeToHome}
-          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-full transition-all"
+          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
         >
           <X className="h-6 w-6" />
         </button>
 
+        {/* Form Content */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-md">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">Create Account</h2>
-            <p className="text-center text-gray-600 mb-6">Join us today!</p>
+          <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
+              Create Account
+            </h2>
+            <p className="text-center text-gray-600 mb-6">
+              Join us today! Fill in your details to get started.
+            </p>
 
             <form className="space-y-4" onSubmit={handleSignUp}>
-              {/* Names Row */}
+              {/* Name Fields */}
               <div className="grid grid-cols-2 gap-3">
-                {["firstName", "lastName"].map((field) => (
-                  <div key={field}>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        type="text"
-                        name={field}
-                        value={formData[field]}
-                        onChange={handleInputChange}
-                        onKeyPress={(e) => handleKeyPress(e, "name")}
-                        placeholder={field === "firstName" ? "First Name" : "Last Name"}
-                        className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:outline-none transition-all ${
-                          errors[field] ? "border-red-400" : "border-gray-200 focus:border-orange-500"
-                        }`}
-                      />
-                    </div>
-                    {errors[field] && <p className="text-xs text-red-500 mt-1">{errors[field]}</p>}
+                {/* First Name */}
+                <div>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      onKeyPress={(e) => handleKeyPress(e, "name")}
+                      placeholder="First Name"
+                      className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg ${
+                        errors.firstName
+                          ? "border-red-400"
+                          : "border-gray-200"
+                      }`}
+                    />
                   </div>
-                ))}
+                  {errors.firstName && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.firstName}
+                    </p>
+                  )}
+                </div>
+
+                {/* Last Name */}
+                <div>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      onKeyPress={(e) => handleKeyPress(e, "name")}
+                      placeholder="Last Name"
+                      className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg ${
+                        errors.lastName
+                          ? "border-red-400"
+                          : "border-gray-200"
+                      }`}
+                    />
+                  </div>
+                  {errors.lastName && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.lastName}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              {/* Email Field */}
+              {/* Email */}
               <div>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -224,35 +241,39 @@ const Register = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="Email Address"
-                    className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:outline-none ${
-                      errors.email ? "border-red-400" : "border-gray-200 focus:border-orange-500"
+                    className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg ${
+                      errors.email ? "border-red-400" : "border-gray-200"
                     }`}
                   />
                 </div>
-                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                )}
               </div>
 
-              {/* Phone Field */}
+              {/* Phone */}
               <div>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type="tel"
                     name="contact"
-                    maxLength={10}
                     value={formData.contact}
                     onChange={handleInputChange}
                     onKeyPress={(e) => handleKeyPress(e, "phone")}
+                    maxLength={10}
                     placeholder="Phone Number"
-                    className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:outline-none ${
-                      errors.contact ? "border-red-400" : "border-gray-200 focus:border-orange-500"
+                    className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg ${
+                      errors.contact ? "border-red-400" : "border-gray-200"
                     }`}
                   />
                 </div>
-                {errors.contact && <p className="text-xs text-red-500 mt-1">{errors.contact}</p>}
+                {errors.contact && (
+                  <p className="text-xs text-red-500 mt-1">{errors.contact}</p>
+                )}
               </div>
 
-              {/* Address Field */}
+              {/* Address */}
               <div>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -262,15 +283,17 @@ const Register = () => {
                     value={formData.address}
                     onChange={handleInputChange}
                     placeholder="Address"
-                    className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:outline-none ${
-                      errors.address ? "border-red-400" : "border-gray-200 focus:border-orange-500"
+                    className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg ${
+                      errors.address ? "border-red-400" : "border-gray-200"
                     }`}
                   />
                 </div>
-                {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
+                {errors.address && (
+                  <p className="text-xs text-red-500 mt-1">{errors.address}</p>
+                )}
               </div>
 
-              {/* Password Field */}
+              {/* Password */}
               <div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -280,34 +303,53 @@ const Register = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder="Password"
-                    className={`w-full pl-10 pr-12 py-2.5 border-2 rounded-lg focus:outline-none ${
-                      errors.password ? "border-red-400" : "border-gray-200 focus:border-orange-500"
+                    className={`w-full pl-10 pr-12 py-2.5 border-2 rounded-lg ${
+                      errors.password ? "border-red-400" : "border-gray-200"
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
-                {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+                {errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                )}
               </div>
 
-              {/* Strength Indicator */}
+              {/* Password Strength */}
               {formData.password && (
                 <div className="space-y-1">
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="h-1.5 rounded-full transition-all duration-300"
-                      style={{ width: `${passwordStrength}%`, backgroundColor: getPasswordStrengthColor() }}
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${passwordStrength}%`,
+                        backgroundColor: getPasswordStrengthColor(),
+                      }}
                     ></div>
                   </div>
+                  <p className="text-xs text-gray-600">
+                    Password Strength:{" "}
+                    {passwordStrength <= 25
+                      ? "Weak"
+                      : passwordStrength <= 50
+                      ? "Fair"
+                      : passwordStrength <= 75
+                      ? "Good"
+                      : "Strong"}
+                  </p>
                 </div>
               )}
 
-              {/* Confirm Password Field */}
+              {/* Confirm Password */}
               <div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -317,22 +359,43 @@ const Register = () => {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     placeholder="Confirm Password"
-                    className={`w-full pl-10 pr-12 py-2.5 border-2 rounded-lg focus:outline-none ${
-                      errors.confirmPassword ? "border-red-400" : "border-gray-200 focus:border-orange-500"
+                    className={`w-full pl-10 pr-12 py-2.5 border-2 rounded-lg ${
+                      errors.confirmPassword
+                        ? "border-red-400"
+                        : "border-gray-200"
                     }`}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
+                  {formData.confirmPassword && (
+                    <div className="absolute -right-8 top-1/2 -translate-y-1/2">
+                      {formData.password === formData.confirmPassword ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500" />
+                      )}
+                    </div>
+                  )}
                 </div>
-                {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
 
-              {/* Terms Checkbox */}
+              {/* Terms */}
               <div>
                 <div className="flex items-center space-x-2">
                   <input
@@ -340,30 +403,42 @@ const Register = () => {
                     id="terms"
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
+                    className="h-4 w-4 text-yellow-400 focus:ring-yellow-400 border-gray-300 rounded"
                   />
-                  <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
-                    I agree to the <span className="text-orange-600 hover:underline">Terms & Conditions</span>
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-gray-600 select-none"
+                  >
+                    I agree to the{" "}
+                    <a
+                      href="#"
+                      className="text-yellow-600 hover:underline font-medium"
+                    >
+                      Terms & Conditions
+                    </a>
                   </label>
                 </div>
-                {errors.terms && <p className="text-xs text-red-500 mt-1">{errors.terms}</p>}
+                {errors.terms && (
+                  <p className="text-xs text-red-500 mt-1">{errors.terms}</p>
+                )}
               </div>
 
-              {/* Submit */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading || !agreedToTerms}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg disabled:opacity-50 transition-all shadow-lg active:scale-95"
+                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-800 font-bold py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 {isLoading ? "Creating Account..." : "Create My Account"}
               </button>
 
-              <div className="text-center pt-4 border-t">
-                <span className="text-gray-600 text-sm">Already have an account? </span>
+              {/* Login Link */}
+              <div className="text-center pt-4 border-t border-gray-200">
+                <span className="text-gray-600">Already have an account? </span>
                 <button
                   type="button"
                   onClick={() => navigate("/login")}
-                  className="text-orange-600 font-semibold hover:text-orange-700 text-sm"
+                  className="text-yellow-600 font-semibold hover:text-yellow-700 transition-colors duration-200"
                 >
                   Sign In
                 </button>

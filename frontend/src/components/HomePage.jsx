@@ -1,43 +1,25 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Added for navigation
+import { ChevronLeft, ChevronRight, Utensils, Clock, Pizza, Coffee, Leaf } from 'lucide-react';
 import Footer from "./Footer";
 import ChatBot from "./AI/chatbot";
 
 const CanteenHomepage = () => {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    // Load theme from localStorage on mount
-    const savedTheme = localStorage.getItem('theme') === 'dark';
-    setDarkMode(savedTheme);
-  }, []);
-
-  useEffect(() => {
-    // Save to localStorage and toggle class on html
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-  };
-  const videoRef = useRef(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  // Single video source
-  const videoSource = 'images/3.mp4';
+  const images = ['images/Canteen 1.jpg', 'images/Canteen 2.jpg', 'images/Canteen 3.jpg'];
 
-  const scrollToMenu = () => {
-    const menuSection = document.getElementById("menu");
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [images.length]);
 
+  const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+
+  // Updated with 'path' properties for routing
   const categories = [
     { 
       name: "Juice Bar", 
@@ -74,79 +56,70 @@ const CanteenHomepage = () => {
   ];
 
   return (
-<div className={`min-h-screen ${darkMode ? 'dark bg-slate-900' : 'bg-slate-50'} font-sans`}>
+    <div className="min-h-screen bg-slate-50 font-sans">
       
-      {/* Hero Section with Single Video Background */}
+      {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/50 z-10"></div>
-        
-        <div className="absolute inset-0 w-full h-full">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src={videoSource} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        {/* Hero Content */}
-        {/* Theme Toggle Button */}
-        <button
-          onClick={toggleTheme}
-          className="fixed top-6 right-6 z-30 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-3 rounded-2xl shadow-2xl border border-white/50 dark:border-slate-700/50 hover:scale-105 transition-all duration-300 flex items-center gap-1 text-slate-900 dark:text-slate-100"
-          title="Toggle Theme"
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </button>
-        
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-2xl">Theme Cloure
-            SKIP THE <span className="text-orange-500">QUEUE.</span>
-          </h1>
-          <p className="text-xl text-white/90 mb-8 font-medium max-w-xl">
-            Pre-order your favorite campus meals and pick them up when they're ready.
-          </p>
-          <div className="flex gap-4 flex-wrap justify-center">
-            <button
-              onClick={scrollToMenu}
-              className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2"
+        <div className="absolute inset-0 bg-black/40 z-10"></div>
+        <div className="relative w-full h-full">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+              }`}
             >
-              <Utensils className="w-5 h-5" /> Order Now
-            </button>
+              <img src={image} alt="Canteen Food" className="w-full h-full object-cover" />
+            </div>
+          ))}
 
-            <Link to="/bulk-order">
-              <button className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
-                <Clock className="w-5 h-5" /> Bulk Order
+          {/* Slider Controls */}
+          <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-3 rounded-full transition-all">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white p-3 rounded-full transition-all">
+            <ChevronRight className="w-6 h-6" />
+          </button>
+
+          {/* Hero Content */}
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-lg">
+              SKIP THE <span className="text-orange-500">QUEUE.</span>
+            </h1>
+            <p className="text-xl text-white/90 mb-8 font-medium max-w-xl">
+              Pre-order your favorite campus meals and pick them up when they're ready.
+            </p>
+            <div className="flex gap-4">
+              <button className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2">
+                <Utensils className="w-5 h-5" /> Order Now
               </button>
-            </Link>
+              <button className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
+                <Clock className="w-5 h-5" /> Track Order
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section id="menu" className="py-20 px-8 max-w-7xl mx-auto">
+      <section className="py-20 px-8 max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-12">
           <div>
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Browse Menu</h2>
-            <p className="text-slate-500 dark:text-slate-400 mt-2">Selection of fresh meals available today</p>
+            <h2 className="text-4xl font-bold text-slate-900">Browse Menu</h2>
+            <p className="text-slate-500 mt-2">Selection of fresh meals available today</p>
           </div>
           <div className="hidden md:block h-1 w-1/3 bg-orange-100 rounded-full mb-4"></div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category, index) => (
+            /* Using Link instead of div to enable navigation */
             <Link
               key={index}
               to={category.path}
               className="group relative h-80 rounded-2xl overflow-hidden shadow-lg cursor-pointer transition-transform duration-300 hover:-translate-y-2 block"
             >
+              {/* Background Image Container with Zoom effect */}
               <div 
                 className="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
                 style={{
@@ -155,6 +128,8 @@ const CanteenHomepage = () => {
                   backgroundPosition: 'center'
                 }}
               />
+
+              {/* Card content aligned to bottom */}
               <div className="relative h-full p-8 flex flex-col justify-end z-10">
                 <div className={`${category.color} mb-4 bg-white/95 w-12 h-12 flex items-center justify-center rounded-xl group-hover:bg-white transition-colors`}>
                   {category.icon}
@@ -178,7 +153,7 @@ const CanteenHomepage = () => {
       <section className="py-20 px-8 bg-orange-500">
         <div className="max-w-6xl mx-auto rounded-3xl bg-slate-900 p-12 flex flex-col lg:flex-row items-center gap-12 text-white shadow-2xl">
           <div className="lg:w-1/2">
-            <span className="bg-orange-400/90 dark:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase backdrop-blur-sm">
+            <span className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase">
               How it works
             </span>
             <h2 className="text-4xl font-bold mt-6 mb-8">
@@ -201,17 +176,13 @@ const CanteenHomepage = () => {
             </div>
           </div>
           
-            <div className="lg:w-1/2 bg-white/10 dark:bg-slate-800/30 p-8 rounded-2xl border border-white/20 dark:border-slate-600/50 w-full backdrop-blur-sm">
+          <div className="lg:w-1/2 bg-white/5 p-8 rounded-2xl border border-white/10 w-full">
             <h3 className="text-2xl font-bold mb-4 text-orange-400">Today's Special</h3>
             <div className="aspect-video bg-slate-800 rounded-xl mb-4 overflow-hidden shadow-inner">
-                <img src="images/6.jpg" alt="Special" className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
+               <img src="images/6.jpg" alt="Special" className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
             </div>
             <p className="text-lg mb-4 font-semibold text-white">Chef's Signature Spicy Ramen Bowl</p>
-            
-            <button 
-              onClick={scrollToMenu}
-              className="w-full bg-orange-500 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all hover:shadow-lg active:scale-95"
-            >
+            <button className="w-full bg-orange-500 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all hover:shadow-lg active:scale-95">
               Add to Order - $8.50
             </button>
           </div>

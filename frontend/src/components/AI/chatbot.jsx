@@ -5,7 +5,6 @@ import "./chatbot.css";
 import ChartForm from "./ChartForm";
 import ChatMessage from "./ChatMessage";
 import { companyInfo } from './companyInfo';
-import { GEMINI_API_URL } from "../../lib/axios";
 
 function Chatbot() {
  const [chatHistory, setChatHistory] = useState([
@@ -37,11 +36,7 @@ function Chatbot() {
     
     try{
       //make the API call to generate a response
-      if (!GEMINI_API_URL) {
-        throw new Error("Gemini API URL is not configured.");
-      }
-
-      const response = await fetch(GEMINI_API_URL, requestOptions);
+      const response = await fetch(import.meta.env.VITE_API_URL, requestOptions);
       const data = await response.json();
       if(!response.ok) throw new Error(data.error.message || "Failed to fetch response");
       const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*|__|\*/g, '').trim();

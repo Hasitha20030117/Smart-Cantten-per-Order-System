@@ -9,7 +9,6 @@ import {
   X,
 } from "lucide-react";
 import { generateUsersPDF } from "./userPDF";
-import axios from "../../lib/axios";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -34,8 +33,11 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("/user/AllUser");
-        setUsers(res.data);
+        const res = await fetch("http://localhost:8070/user/AllUser", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        setUsers(data);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
@@ -96,7 +98,10 @@ const Users = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`/user/deleteUser/${id}`);
+      await fetch(`http://localhost:8070/user/deleteUser/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       setUsers((prev) => prev.filter((u) => u._id !== id));
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -120,18 +125,28 @@ const Users = () => {
         if (!bodyData.password) delete bodyData.password;
         if (!bodyData.confirmPassword) delete bodyData.confirmPassword;
 
-        const res = await axios.put(
-          `/user/updateUser/${editingUser._id}`,
-          bodyData
+        const res = await fetch(
+          `http://localhost:8070/user/updateUser/${editingUser._id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(bodyData),
+          }
         );
-        const updatedUser = res.data?.user || res.data;
+        const updatedUser = await res.json();
         setUsers((prev) =>
           prev.map((u) => (u._id === updatedUser._id ? updatedUser : u))
         );
         alert("User updated successfully");
       } else {
-        const res = await axios.post(`/user/addUser`, formData);
-        const newUser = res.data?.user || res.data;
+        const res = await fetch(`http://localhost:8070/user/addUser`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(formData),
+        });
+        const newUser = await res.json();
         setUsers((prev) => [...prev, newUser]);
         alert("User added successfully");
       }

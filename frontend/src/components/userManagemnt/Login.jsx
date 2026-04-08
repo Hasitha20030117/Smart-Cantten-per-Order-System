@@ -68,7 +68,7 @@ const Login = () => {
         {/* Close Button */}
         <button
           onClick={closeToHome}
-          className="absolute top-6 right-6 z-20 p-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-full transition-all duration-200"
+          className="absolute top-6 right-6 z-20 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
         >
           <X className="h-6 w-6" />
         </button>
@@ -102,7 +102,7 @@ const Login = () => {
                   className={`w-full pl-10 pr-4 py-2.5 border-2 rounded-lg focus:outline-none transition-all duration-200 ${
                     errors.email
                       ? "border-red-400 focus:border-red-500"
-                      : "border-gray-200 focus:border-orange-500"
+                      : "border-gray-200 focus:border-yellow-400"
                   }`}
                 />
               </div>
@@ -122,13 +122,13 @@ const Login = () => {
                   className={`w-full pl-10 pr-12 py-2.5 border-2 rounded-lg focus:outline-none transition-all duration-200 ${
                     errors.password
                       ? "border-red-400 focus:border-red-500"
-                      : "border-gray-200 focus:border-orange-500"
+                      : "border-gray-200 focus:border-yellow-400"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -141,7 +141,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/forget-password")}
-                  className="text-orange-600 hover:text-orange-700 hover:underline text-sm font-medium transition-colors"
+                  className="text-blue-600 hover:underline text-sm font-medium"
                 >
                   Forgot password?
                 </button>
@@ -150,7 +150,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg"
+                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-800 font-bold py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 {isLoading ? "Logging in..." : "Login"}
               </button>
@@ -160,7 +160,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/register")}
-                  className="text-orange-600 font-semibold hover:text-orange-700 transition-colors duration-200"
+                  className="text-yellow-600 font-semibold hover:text-yellow-700 transition-colors duration-200"
                 >
                   Sign up
                 </button>
