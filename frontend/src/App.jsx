@@ -1,10 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import {\n  BrowserRouter as Router,\n  Routes,\n  Route,\n  Navigate,\n  useLocation,\n} from "react-router-dom";\nimport { ThemeProvider } from "./contexts/ThemeContext";\nimport ChatBot from "./components/AI/chatbot";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
@@ -80,13 +74,7 @@ function App() {
 
   if (isCheckingAuth) return <LoadingSpinner />;
 
-  return (
-    <Router>
-      <ConditionalNavbar />
-      
-      
-  
-      <Routes>
+  return (\n    <ThemeProvider>\n      <Router>\n        <ConditionalNavbar />\n        <Routes>
        
         
         {/* Root Route - redirect admin automatically */}
@@ -165,15 +153,7 @@ function App() {
 
     
 
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 3000,
-          style: { background: "#363636", color: "#fff" },
-        }}
-      />
-    </Router>
-  );
+        <ChatBot />\n        <Toaster\n          position="top-right"\n          toastOptions={{\n            duration: 3000,\n            style: { background: "#363636", color: "#fff", dark: "dark:bg-slate-800 dark:text-white" },\n          }}\n        />\n      </Router>\n    </ThemeProvider>\n  );\n
 }
 
 export default App;

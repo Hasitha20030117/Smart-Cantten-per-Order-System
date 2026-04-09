@@ -1,31 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight, Sun, Moon } from 'lucide-react';
-import Footer from "./Footer";
-import ChatBot from "./AI/chatbot";
+import { Link } from 'react-router-dom';\nimport { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight } from 'lucide-react';\nimport Footer from "./Footer";
 
 const CanteenHomepage = () => {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    // Load theme from localStorage on mount
-    const savedTheme = localStorage.getItem('theme') === 'dark';
-    setDarkMode(savedTheme);
-  }, []);
-
-  useEffect(() => {
-    // Save to localStorage and toggle class on html
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-  };
   const videoRef = useRef(null);
   
   // Single video source
@@ -96,15 +72,7 @@ const CanteenHomepage = () => {
         </div>
 
         {/* Hero Content */}
-        {/* Theme Toggle Button */}
-        <button
-          onClick={toggleTheme}
-          className="fixed top-6 right-6 z-30 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-3 rounded-2xl shadow-2xl border border-white/50 dark:border-slate-700/50 hover:scale-105 transition-all duration-300 flex items-center gap-1 text-slate-900 dark:text-slate-100"
-          title="Toggle Theme"
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </button>
+        {/* Theme toggle now global */}
         
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-4 drop-shadow-2xl">Theme Cloure
@@ -218,7 +186,6 @@ const CanteenHomepage = () => {
         </div>
       </section>
 
-      <ChatBot />
       <Footer />
     </div>
   );
