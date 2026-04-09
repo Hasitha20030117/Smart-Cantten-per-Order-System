@@ -31,11 +31,19 @@ export const addUser = async (req, res) => {
         throw new Error("All fields are Required");
     }
 
-    const userAlreadyExists =await User.findOne({email});
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedPhoneNumber = phoneNumber.trim();
+
+    const userAlreadyExists = await User.findOne({ email: normalizedEmail });
     console.log("userAlreadyExists", userAlreadyExists);
 
     if (userAlreadyExists){
-        return res.status(400).json({message: "User already exists"});
+        return res.status(400).json({ success: false, message: "Email is already registered" });
+    }
+
+    const phoneAlreadyExists = await User.findOne({ phoneNumber: normalizedPhoneNumber });
+    if (phoneAlreadyExists) {
+        return res.status(400).json({ success: false, message: "Phone number is already registered" });
     }
 
     // Basic confirm password check (do NOT store it)
@@ -51,8 +59,8 @@ export const addUser = async (req, res) => {
       profilePic,
       firstName,
       lastName,
-      email,
-      phoneNumber,
+      email: normalizedEmail,
+      phoneNumber: normalizedPhoneNumber,
       address,
       password: hashed, // store hashed only
       role,
@@ -63,23 +71,42 @@ export const addUser = async (req, res) => {
   
 
     await newUser.save();
-    
 
     //jwt
     generateTokenAndSetCookie(res,newUser._id);
-    await sendVerificationEmail(newUser.email, verificationToken);
+
+    let emailWarning = null;
+    try {
+      await sendVerificationEmail(newUser.email, verificationToken);
+    } catch (emailError) {
+      console.error("Verification email failed:", emailError);
+      emailWarning = "Account created, but verification email could not be sent right now.";
+    }
 
     
     res.status(201).json({
         success: true,
-        message: "User Registered successfully",
+        message: emailWarning || "User Registered successfully",
+        warning: emailWarning,
         user: {
             ...newUser._doc,
             password: undefined,
              },
         });
     } catch (error) {
-        res.status(408).json({success: false, message: error.message });
+        console.error("Error in addUser", error);
+        if (error?.code === 11000) {
+          const duplicateField = Object.keys(error.keyPattern || {})[0];
+          const fieldMessages = {
+            email: "Email is already registered",
+            phoneNumber: "Phone number is already registered",
+          };
+          return res.status(400).json({
+            success: false,
+            message: fieldMessages[duplicateField] || "Duplicate value already exists",
+          });
+        }
+        res.status(500).json({success: false, message: error.message || "Failed to register user" });
     }
 };
 

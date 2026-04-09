@@ -6,6 +6,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import cron from "node-cron";
+import Order from "./models/Canteen/Order.js";
+import Payment from "./models/Canteen/Payment.js";
 
 dotenv.config();
 
@@ -16,13 +19,41 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CORS configuration
-app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+const allowedOrigins = new Set(
+  [
+    process.env.CLIENT_URL,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+  ].filter(Boolean)
+);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.has(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Vary", "Origin");
+  }
+
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
+
+app.use(
+  cors({
+    origin: Array.from(allowedOrigins),
+    credentials: true,
+  })
+);
 
 app.use(bodyParser.json());
 app.use(express.json());
@@ -39,12 +70,22 @@ mongoose
 
 // ========== EXISTING ROUTES ==========
 import userRoutes from "./routes/UserManagement/User.js";
-app.use("/user", userRoutes);
-
-// ========== BULK ORDERING ROUTES ==========
+import paymentRoutes from "./routes/Canteen/paymentRoutes.js";
+import adminPaymentRoutes from "./routes/Canteen/adminPaymentRoutes.js";
+import receiptRoutes from "./routes/Canteen/receiptRoutes.js";
+import tokenRoutes from "./routes/Canteen/tokenRoutes.js";
+import orderManagementRoutes from "./routes/OrderManagement/orderRoutes.js";
 import bulkOrderRoutes from "./routes/bulkOrder.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 
+app.use("/user", userRoutes);
+app.use("/api/orders", orderManagementRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/admin", adminPaymentRoutes);
+app.use("/api/receipts", receiptRoutes);
+app.use("/api/tokens", tokenRoutes);
+
+// ========== BULK ORDERING ROUTES ==========
 app.use("/api/bulk-order", bulkOrderRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 
@@ -80,6 +121,11 @@ app.use((req, res) => {
     message: `Route ${req.originalUrl} not found`,
     availableRoutes: {
       user: "/user",
+      orders: "/api/orders",
+      payments: "/api/payments",
+      admin: "/api/admin",
+      receipts: "/api/receipts",
+      tokens: "/api/tokens",
       bulkOrder: "/api/bulk-order",
       subscription: "/api/subscription",
       health: "/api/health"
@@ -93,6 +139,13 @@ app.listen(PORT, () => {
   console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
   console.log(`\n📋 Available Routes:`);
   console.log(`   - /user                    (User Management)`);
+  console.log(`   - GET    /api/orders`);
+  console.log(`   - POST   /api/orders`);
+  console.log(`   - GET    /api/payments`);
+  console.log(`   - POST   /api/payments/start`);
+  console.log(`   - GET    /api/admin/payments`);
+  console.log(`   - GET    /api/receipts/:paymentId`);
+  console.log(`   - GET    /api/tokens/:tokenRef`);
   console.log(`   - POST   /api/bulk-order/create-event`);
   console.log(`   - GET    /api/bulk-order/menu`);
   console.log(`   - POST   /api/bulk-order/select-meal`);
