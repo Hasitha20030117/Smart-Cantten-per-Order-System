@@ -114,12 +114,13 @@ const CanteenHomepage = () => {
             Pre-order your favorite campus meals and pick them up when they're ready.
           </p>
           <div className="flex gap-4 flex-wrap justify-center">
-            <button
-              onClick={scrollToMenu}
-              className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2"
-            >
-              <Utensils className="w-5 h-5" /> Order Now
-            </button>
+            <Link to="/orders/create">
+              <button
+                className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2"
+              >
+                <Utensils className="w-5 h-5" /> Order Now
+              </button>
+            </Link>
 
             <Link to="/bulk-order">
               <button className="bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
