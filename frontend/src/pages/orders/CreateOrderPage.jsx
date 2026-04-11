@@ -112,9 +112,9 @@ function CreateOrderPage() {
               className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-orange-500"
             >
               <option>Main Canteen</option>
-              <option>Canteen2</option>
-              <option>Canteen3</option>
-              <option>Canteen4</option>
+              <option>Juice Bar</option>
+              <option>New canteen</option>
+              <option>Anohana canteen</option>
             </select>
             <input
               name="timeSlot"
