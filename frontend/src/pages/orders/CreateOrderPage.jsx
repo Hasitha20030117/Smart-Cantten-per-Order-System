@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "../../lib/axios";
@@ -19,9 +19,13 @@ const VALIDATION_RULES = {
   },
 };
 
+const CANTEENS = ["Main Canteen", "Juice Bar", "New canteen", "Anohana canteen"];
+
 function CreateOrderPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [menusLoading, setMenusLoading] = useState(false);
+  const [canteenMenus, setCanteenMenus] = useState({});
   const [formData, setFormData] = useState({
     customerName: "",
     canteen: "Main Canteen",
@@ -29,6 +33,29 @@ function CreateOrderPage() {
     items: [emptyItem],
   });
   const [errors, setErrors] = useState({});
+
+  // Fetch menus for all canteens
+  useEffect(() => {
+    const fetchAllMenus = async () => {
+      setMenusLoading(true);
+      const menus = {};
+
+      for (const canteen of CANTEENS) {
+        try {
+          const response = await axios.get(`/api/menu/canteen/${encodeURIComponent(canteen)}`);
+          menus[canteen] = response.data.data || [];
+        } catch (error) {
+          console.error(`Error fetching menu for ${canteen}:`, error);
+          menus[canteen] = [];
+        }
+      }
+
+      setCanteenMenus(menus);
+      setMenusLoading(false);
+    };
+
+    fetchAllMenus();
+  }, []);
 
   const validateField = (fieldName, value) => {
     const newErrors = { ...errors };
@@ -161,6 +188,39 @@ function CreateOrderPage() {
       ...current,
       items: current.items.filter((_, itemIndex) => itemIndex !== index),
     }));
+  };
+
+  const addMenuItemToOrder = (menuItem) => {
+    const existingItemIndex = formData.items.findIndex(
+      (item) => item.name.toLowerCase() === menuItem.name.toLowerCase()
+    );
+
+    if (existingItemIndex !== -1) {
+      // Item exists, increase quantity
+      setFormData((current) => ({
+        ...current,
+        items: current.items.map((item, i) =>
+          i === existingItemIndex
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        ),
+      }));
+      toast.success(`${menuItem.name} quantity increased`);
+    } else {
+      // New item
+      setFormData((current) => ({
+        ...current,
+        items: [
+          ...current.items.filter((item) => item.name !== ""), // Remove empty placeholder
+          {
+            name: menuItem.name,
+            quantity: 1,
+            price: menuItem.price,
+          },
+        ],
+      }));
+      toast.success(`${menuItem.name} added to order`);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -302,6 +362,68 @@ function CreateOrderPage() {
                 <p className="mt-1 text-sm text-red-600">{errors.timeSlot}</p>
               )}
             </div>
+          </div>
+
+          {/* Menu Items Section */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">
+              Available Menu Items - {formData.canteen}
+            </h3>
+
+            {menusLoading ? (
+              <div className="flex items-center justify-center h-24">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              </div>
+            ) : canteenMenus[formData.canteen]?.length > 0 ? (
+              <div className="grid gap-3 max-h-72 overflow-y-auto">
+                {canteenMenus[formData.canteen].map((menuItem) => (
+                  <button
+                    key={menuItem._id}
+                    type="button"
+                    onClick={() => addMenuItemToOrder(menuItem)}
+                    className="flex items-center justify-between bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-2xl p-4 transition-all text-left"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-bold text-slate-900">{menuItem.name}</h4>
+                        {menuItem.dietary && menuItem.dietary.length > 0 && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                            {menuItem.dietary[0]}
+                          </span>
+                        )}
+                      </div>
+                      {menuItem.description && (
+                        <p className="text-sm text-slate-600 line-clamp-1">
+                          {menuItem.description}
+                        </p>
+                      )}
+                      <p className="text-xs text-slate-500 mt-1">
+                        Prep time: {menuItem.preparationTime} min
+                      </p>
+                    </div>
+                    <div className="ml-4 flex flex-col items-end gap-2">
+                      <span className="font-bold text-orange-600 text-lg">
+                        Rs.{menuItem.price}
+                      </span>
+                      <span className="bg-orange-500 text-white px-3 py-1 rounded-lg text-sm font-semibold hover:bg-orange-600">
+                        Add
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-2xl">
+                No menu items available for {formData.canteen}
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">
+              Order Items {formData.items.length > 0 && `(${formData.items.length})`}
+            </h3>
           </div>
 
           <div className="space-y-4">

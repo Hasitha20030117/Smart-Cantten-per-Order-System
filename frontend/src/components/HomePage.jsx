@@ -254,7 +254,7 @@ const CanteenHomepage = () => {
                         
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                            ₹{item.price}
+                            Rs.{item.price}
                           </span>
                           <span className="text-xs text-slate-500 dark:text-slate-400">
                             {item.preparationTime} min
@@ -335,7 +335,7 @@ const CanteenHomepage = () => {
               onClick={scrollToMenu}
               className="w-full bg-orange-500 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all hover:shadow-lg active:scale-95"
             >
-              Add to Order - $8.50
+              Add to Order - Rs.50
             </button>
           </div>
         </div>
