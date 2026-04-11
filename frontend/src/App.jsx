@@ -8,7 +8,6 @@ import {
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
-
 import AdminDashboard from "./components/AdminDashboard";
 import Login from "./components/userManagemnt/Login";
 import Navbar from "./components/navigationBar";
@@ -35,7 +34,10 @@ import SubscriptionPage from "./pages/bulk/SubscriptionPage";
 import TokenGenerationPage from "./pages/bulk/TokenGenerationPage";
 import CreateOrderPage from "./pages/orders/CreateOrderPage";
 import OrdersPage from "./pages/orders/OrdersPage";
-
+import JuiceBar from "./pages/menu/JuiceBar";
+import Basement from "./pages/menu/Basement";
+import NewCanteen from "./pages/menu/NewCanteen";
+import Anohana from "./pages/menu/Anohana";
 
 import { useAuthStore } from "./store/user";
 
@@ -61,7 +63,6 @@ const ConditionalNavbar = () => {
 
   const hideNavbarRoutes = [
     "/admin/dashboard", // hide on admin dashboard
-    "/profile",
     "/canteen/admin/payments",
   ];
 
@@ -93,12 +94,7 @@ function App() {
   return (
     <Router>
       <ConditionalNavbar />
-      
-      
-  
       <Routes>
-       
-        
         {/* Root Route - redirect admin automatically */}
         <Route
           path="/"
@@ -106,8 +102,8 @@ function App() {
             isAuthenticated
               ? user?.role === "admin"
                 ? <Navigate to="/admin/dashboard" replace />
-                : <HomePage />  // ✅ Customer sees HomePage
-                : <HomePage />    // ✅ Public sees HomePage
+                : <HomePage />
+              : <HomePage />
           }
         />
 
@@ -151,16 +147,15 @@ function App() {
         <Route path="/subscription" element={<SubscriptionPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/orders/create" element={<CreateOrderPage />} />
+        <Route path="/menu/juice-bar" element={<JuiceBar />} />
+        <Route path="/menu/basement" element={<Basement />} />
+        <Route path="/menu/new-canteen" element={<NewCanteen />} />
+        <Route path="/menu/anohana" element={<Anohana />} />
 
-        {/* Customer Routes */}
-        <Route
-          path="/profile"
-          element={
-            <CustomerRoute>
-              <UserProfile />
-            </CustomerRoute>
-          }
-        />
+        {/* Profile - Now Public for Demo */}
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/user-profile" element={<UserProfile />} />
+
 
         {/* Admin Routes */}
         <Route
@@ -183,8 +178,6 @@ function App() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
-    
 
       <Toaster
         position="top-right"

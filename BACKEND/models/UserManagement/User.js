@@ -1,4 +1,4 @@
-// models/UserManagement/User.js  (ESM)
+
 
 import mongoose from "mongoose";
 
@@ -44,6 +44,23 @@ const UserSchema = new Schema(
 			default: "customer",
 		},
 
+    rewardPoints: {
+      type: Map,
+      of: Number,
+      default: {},
+    },
+
+    rewardHistory: [
+      {
+        date: { type: Date, default: Date.now },
+        action: { type: String, enum: ['Earned', 'Converted', 'Donated'], required: true },
+        points: { type: Number, required: true },
+        canteen: { type: String, default: 'Bulk Event' },
+        amount: { type: Number, required: true },
+        description: { type: String, default: '' }
+      }
+    ],
+
     lastLogin: { type: Date, default: Date.now },
 
     isVerified: { type: Boolean, default: false },
@@ -55,6 +72,10 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
+
+UserSchema.virtual('totalRewardPoints').get(function() {
+  return Object.values(this.rewardPoints || {}).reduce((sum, points) => sum + points, 0);
+});
 
 const User = mongoose.model("User", UserSchema);
 export default User;

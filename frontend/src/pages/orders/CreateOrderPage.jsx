@@ -3,14 +3,19 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "../../lib/axios";
 
+import { useAuthStore } from "../../store/user";
+
+const CANTEENS = ["Juice Bar", "Basement Canteen", "New Canteen", "Anohana Canteen"];
+
 const emptyItem = { name: "", quantity: 1, price: 0 };
 
 function CreateOrderPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     customerName: "",
-    canteen: "Main Canteen",
+    canteen: "New Canteen",
     timeSlot: "",
     items: [emptyItem],
   });
@@ -59,9 +64,10 @@ function CreateOrderPage() {
       const response = await axios.post("/api/orders", {
         customerName: formData.customerName.trim(),
         canteen: formData.canteen,
-        timeSlot: formData.timeSlot,
+        timeSlot: formData.timeSlot.trim(),
         items: cleanedItems,
         totalAmount,
+        ...(user?._id && { userId: user._id }),
       });
 
       toast.success(`Order placed! Token ${response.data.tokenNumber}`);
@@ -82,8 +88,8 @@ function CreateOrderPage() {
         },
       });
     } catch (error) {
-      console.error("Create order error:", error);
-      toast.error(error.response?.data?.message || error.response?.data?.error || "Failed to create order.");
+      console.error("Create order error:", error.response?.data || error);
+      toast.error(error.response?.data?.message || error.response?.data?.error || error.message || "Failed to create order. Check canteen/timeSlot.");
     } finally {
       setLoading(false);
     }
@@ -111,10 +117,11 @@ function CreateOrderPage() {
               onChange={handleMainChange}
               className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-orange-500"
             >
-              <option>Main Canteen</option>
-              <option>Canteen2</option>
-              <option>Canteen3</option>
-              <option>Canteen4</option>
+              {CANTEENS.map((canteen) => (
+                <option key={canteen} value={canteen}>
+                  {canteen}
+                </option>
+              ))}
             </select>
             <input
               name="timeSlot"

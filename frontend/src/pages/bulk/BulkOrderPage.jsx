@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { AlertCircle, Calendar, Clock, Mail, Sparkles, Trash2, User, Users } from "lucide-react";
+import { AlertCircle, Calendar, Clock, Mail, Sparkles, Trash2, User, Users, Award, CheckCircle } from "lucide-react";
 import axios from "../../lib/axios";
+import { useAuthStore } from "../../store/user";
 
 const emptyMember = { name: "", email: "" };
 
 function BulkOrderPage() {
   const navigate = useNavigate();
+  const { user, setUser } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     eventName: "",
@@ -22,6 +24,15 @@ function BulkOrderPage() {
   const [members, setMembers] = useState([emptyMember]);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Calculate reward points based on member count
+  const calculateRewardPoints = (memberCount) => {
+    if (memberCount < 2) return 0;
+    if (memberCount === 2) return 1.5;
+    if (memberCount === 3) return 2;
+    if (memberCount === 4) return 2.4;
+    return 2.4 + (memberCount - 4) * 0.6;
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -75,6 +86,12 @@ function BulkOrderPage() {
 
     try {
       setLoading(true);
+      
+      // Count valid members (non-empty names)
+      const validMembers = members.filter(m => m.name.trim());
+      const memberCount = validMembers.length;
+      const earnedPoints = calculateRewardPoints(memberCount);
+      
       const response = await axios.post("/api/bulk-order/create-event", {
         eventName: formData.eventName,
         eventDate: formData.eventDate,
@@ -85,9 +102,22 @@ function BulkOrderPage() {
         numberOfGroups: Number(formData.numberOfGroups),
         description: formData.description,
         members,
+        earnedRewardPoints: earnedPoints,
+        memberCount: memberCount
       });
 
-      toast.success("Event created successfully!");
+      // ✅ Update user state with latest totalRewardPoints from backend
+      await useAuthStore.getState().fetchCurrentUser();
+
+      if (earnedPoints > 0) {
+        toast.success(
+          `🎉 Event created! You earned ${earnedPoints} reward points (Rs${earnedPoints * 10})!\nTotal points updated in Profile!`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success("Event created successfully!");
+      }
+      
       navigate(`/meal-selection/${response.data.group._id}`);
     } catch (error) {
       console.error("Bulk event create error:", error);
@@ -228,6 +258,121 @@ function BulkOrderPage() {
               </div>
             </div>
           </div>
+
+          {/* Reward Points Preview - Display Only */}
+          {(() => {
+            const validMembers = members.filter(m => m.name.trim());
+            const memberCount = validMembers.length;
+            const rewardPoints = calculateRewardPoints(memberCount);
+            
+            const handleSavePoints = async () => {
+              try {
+                const pointsToAdd = rewardPoints; // Use calculated points based on member count
+
+                // Update local store immediately for responsiveness
+                const bulkEventKey = `bulk_event_${Date.now()}`;
+                const updatedRewardPoints = user?.rewardPoints ? { ...user.rewardPoints } : {};
+                updatedRewardPoints[bulkEventKey] = pointsToAdd;
+
+                const totalPoints = Object.values(updatedRewardPoints).reduce((sum, points) => sum + points, 0);
+
+                console.log('🎯 Saving points:', { pointsToAdd, totalPoints, updatedRewardPoints, userId: user?._id });
+
+                // Update user in store (local state)
+                setUser({
+                  ...user,
+                  rewardPoints: updatedRewardPoints,
+                  totalRewardPoints: totalPoints,
+                });
+
+                // Track earned points in reward history (for profile display) - only if authenticated
+                if (user?._id) {
+                  try {
+                    console.log('📝 Tracking reward history...');
+                    const historyRes = await axios.post("/user/earn-reward-points", {
+                      points: pointsToAdd,
+                      canteen: `Bulk Event - ${formData.eventName || 'Untitled'}`,
+                      description: `Earned points from bulk event creation with ${memberCount} member${memberCount !== 1 ? 's' : ''}`
+                    });
+                    console.log('✅ Reward history tracked:', historyRes.data);
+                  } catch (err) {
+                    console.warn("⚠️ Failed to track reward history (non-critical):", err?.response?.data || err.message);
+                  }
+                }
+
+                // Persist to backend
+                try {
+                  console.log('💾 Updating reward points...');
+                  const updateRes = await axios.post("/user/update-reward-points", {
+                    rewardPoints: updatedRewardPoints,
+                    totalRewardPoints: totalPoints,
+                  });
+                  console.log('✅ Reward points updated:', updateRes.data);
+                } catch (err) {
+                  console.warn("⚠️ Backend update failed:", err?.response?.data || err.message);
+                }
+
+                // Refresh auth store from backend to keep everything in sync
+                try {
+                  console.log('🔄 Refreshing auth store...');
+                  await useAuthStore.getState().fetchCurrentUser();
+                  console.log('✅ Auth store refreshed');
+                } catch (err) {
+                  console.warn('⚠️ Failed to refresh current user after saving points:', err.message);
+                }
+
+                toast.success(
+                  `🎉 +${pointsToAdd} points saved! Total: ${totalPoints} points (Rs${totalPoints * 10}) - Profile updated!`,
+                  { duration: 4000 }
+                );
+              } catch (error) {
+                console.error("❌ Error saving points:", error);
+                toast.error("Failed to save rewards");
+              }
+            };
+            
+            return (
+              <div className="space-y-6 mt-8">
+                {/* You will earn preview */}
+                <div className="rounded-2xl border-2 border-green-300 bg-gradient-to-r from-green-50 to-emerald-50 p-6 shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="rounded-full bg-green-500 p-3">
+                        <Award className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-600">You will earn</p>
+                        <p className="text-3xl font-bold text-green-600">
+                          {rewardPoints > 0 ? rewardPoints.toFixed(1) : 0} Points
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-slate-600">Rupee Value</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        Rs{(rewardPoints * 10).toFixed(0)}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-2">{memberCount} members</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 text-sm text-green-700">
+                      <CheckCircle size={16} />
+                      <span>Rewards will be credited after event creation</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleSavePoints}
+                      disabled={rewardPoints === 0}
+                      className="px-6 py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    >
+                      Save The Points
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           <button
             type="submit"
