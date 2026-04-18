@@ -220,3 +220,27 @@ export const joinGroup = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Get reward points for a user
+export const getUserRewardPoints = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const totalPoints = Array.from(user.rewardPoints.values()).reduce((sum, points) => sum + points, 0);
+    
+    res.json({
+      success: true,
+      email: user.email,
+      rewardPoints: totalPoints,
+      pointsByCanteen: Object.fromEntries(user.rewardPoints)
+    });
+  } catch (error) {
+    console.error('Error fetching reward points:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
