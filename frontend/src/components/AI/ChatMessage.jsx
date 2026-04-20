@@ -1,1 +1,14 @@
-import React from 'react';\nimport ChatbotIcon from './ChatbotIcon';\n\nconst ChatMessage = ({ chat, darkMode }) => {\n  return (\n    !chat.hideInChat && (\n      <div className={`message flex items-start gap-3 p-2 ${chat.role === 'model' ? 'flex-row' : 'flex-row-reverse'} ${chat.isError ? 'error-message' : ''}`}>\n        {chat.role === 'model' && (\n          <div className="flex-shrink-0 w-10 h-10 mt-1">\n            <ChatbotIcon />\n          </div>\n        )}\n        <div className={`message-bubble px-4 py-3 rounded-2xl max-w-[80%] text-sm leading-relaxed break-words whitespace-pre-wrap shadow-lg transform transition-all duration-200 hover:scale-[1.02] ${\n          chat.role === 'model'\n            ? darkMode \n              ? 'bg-slate-700 text-slate-100 rounded-br-sm' \n              : 'bg-orange-100/80 text-slate-900 rounded-br-sm'\n            : darkMode \n              ? 'bg-orange-500 text-white rounded-bl-sm ml-auto' \n              : 'bg-orange-500 text-white rounded-bl-sm ml-auto'\n        } ${chat.isError ? 'bg-red-100 dark:bg-red-900/50 border border-red-300 dark:border-red-600 text-red-900 dark:text-red-200 !important' : ''}`}>\n          {chat.text}\n        </div>\n        {chat.role === 'user' && (\n          <div className="w-8 h-8 bg-transparent" /> // Spacer for alignment\n        )}\n      </div>\n    )\n  );\n};\n\nexport default ChatMessage;
+import React from 'react';
+import ChatbotIcon from './ChatbotIcon';
+
+const ChatMessage = ({ chat }) => { // Destructure `chat` from props
+  return (
+    !chat.hideInChat && (
+     <div className={`message ${chat.role === 'model' ? 'bot' : 'user'}-message ${chat.isError ? 'error' : ''}`}>
+      {chat.role === 'model' && <ChatbotIcon />}
+      <p className="message-text">{chat.text}</p>
+    </div>
+  ));
+};
+
+export default ChatMessage;

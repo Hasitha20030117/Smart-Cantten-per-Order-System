@@ -8,6 +8,8 @@ export const useAuthStore = create((set) => ({
   isLoading: false,
   isCheckingAuth: true,
   message: null,
+  rewardPoints: {},
+  totalRewardPoints: 0,
 
   // CHANGED: add confirmPassword param; map to backend's expected keys
   signup: async (FirstName, LastName, Email, Contact, Address, password, confirmPassword) => {
@@ -76,9 +78,58 @@ export const useAuthStore = create((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       const response = await axios.get(`/user/check-auth`);
-      set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false });
+      set({ 
+        user: response.data.user, 
+        isAuthenticated: true, 
+        isCheckingAuth: false,
+        rewardPoints: response.data.user?.rewardPoints || {},
+        totalRewardPoints: response.data.user?.totalRewardPoints || 0
+      });
     } catch {
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
+    }
+  },
+
+  fetchRewardPoints: async () => {
+    try {
+      const response = await axios.get('/user/points');
+      set({
+        rewardPoints: response.data.rewardPoints,
+        totalRewardPoints: response.data.totalRewardPoints
+      });
+    } catch (error) {
+      console.error('Error fetching reward points:', error);
+    }
+  },
+
+  redeemPoints: async (pointsToRedeem, canteenId, orderTotal) => {
+    try {
+      const response = await axios.post('/user/redeem-points', {
+        pointsToRedeem,
+        canteenId,
+        orderTotal
+      });
+      set({
+        rewardPoints: response.data.remainingPointsByCanteen || {},
+        totalRewardPoints: response.data.remainingPoints
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error redeeming points:', error);
+      throw error;
+    }
+  },
+
+  // Fetch current user data to refresh totalRewardPoints after bulk order
+  fetchCurrentUser: async () => {
+    try {
+      if (!useAuthStore.getState().user?._id) return;
+      const response = await axios.get(`/user/selectUser/${useAuthStore.getState().user._id}`);
+      if (response.data?.success && response.data.user) {
+        useAuthStore.getState().setUser(response.data.user);
+      }
+    } catch (error) {
+      console.warn('Failed to fetch current user:', error);
     }
   },
 
@@ -104,5 +155,14 @@ export const useAuthStore = create((set) => ({
       set({ isLoading: false, error: error?.response?.data?.message || "Error resetting password" });
       throw error;
     }
+  },
+
+  // Add/Update user data (local state)
+  setUser: (updatedUser) => {
+    set((state) => ({
+      user: updatedUser,
+      totalRewardPoints: updatedUser?.totalRewardPoints || 0,
+      rewardPoints: updatedUser?.rewardPoints || {}
+    }));
   },
 }));

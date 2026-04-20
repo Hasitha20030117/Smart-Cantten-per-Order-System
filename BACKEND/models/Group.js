@@ -21,6 +21,8 @@ const groupSchema = new mongoose.Schema({
   }],
   inviteCode: { type: String, unique: true },
   status: { type: String, enum: ['active', 'closed', 'completed', 'cancelled'], default: 'active' },
+  earnedRewardPoints: { type: Number, default: 0 },
+  rewardPointsAwarded: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

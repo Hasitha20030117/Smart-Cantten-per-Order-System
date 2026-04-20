@@ -134,13 +134,15 @@ const NavigationBar = () => {
                           <p className="text-sm font-bold text-slate-900">{user?.name}</p>
                           <p className="text-xs text-orange-600 font-bold mt-1">Balance: $45.50</p>
                         </div>
+                        <Link to="/user-profile" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 font-semibold border-b border-slate-50">👤 My Profile</Link>
                         <Link to="/profile" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600">Wallet & Payments</Link>
                         <Link to="/orders" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600">Order History</Link>
                         <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold">Sign Out</button>
                       </>
                     ) : (
-                      <div className="p-4 text-center">
-                        <Link to="/register" className="block w-full bg-orange-600 text-white py-2 rounded-lg font-bold">Login to Order</Link>
+                      <div className="p-4 space-y-3">
+                        <Link to="/user-profile" className="block w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-2 rounded-lg font-bold text-center hover:from-green-600 hover:to-green-700 transition">👤 View Profile</Link>
+                        <Link to="/register" className="block w-full bg-orange-600 text-white py-2 rounded-lg font-bold text-center hover:bg-orange-700 transition">Login to Order</Link>
                       </div>
                     )}
                   </div>

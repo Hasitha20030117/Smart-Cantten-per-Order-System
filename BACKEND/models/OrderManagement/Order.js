@@ -10,7 +10,12 @@ const orderManagementSchema = new mongoose.Schema(
     canteen: {
       type: String,
       required: true,
-      enum: ["Main Canteen", "Canteen2", "Canteen3", "Canteen4"],
+      enum: ["Juice Bar", "Basement Canteen", "New Canteen", "Anohana Canteen"],
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
     },
     items: [
       {

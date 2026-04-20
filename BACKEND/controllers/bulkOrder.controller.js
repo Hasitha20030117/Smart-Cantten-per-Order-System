@@ -1,13 +1,14 @@
 import Group from '../models/Group.js';
 import Order from '../models/Order.js';
 import MenuItem from '../models/MenuItem.js';
+import User from '../models/UserManagement/User.js';
 
 // Create event with members
 export const createEvent = async (req, res) => {
   try {
     const { 
       eventName, eventDate, eventTime, leaderName, leaderEmail, 
-      maxMembers, numberOfGroups, description, members 
+      maxMembers, numberOfGroups, description, members, earnedRewardPoints, memberCount 
     } = req.body;
 
     // Format members
@@ -34,7 +35,9 @@ export const createEvent = async (req, res) => {
       eventName, eventDate, eventTime: eventTime || '12:00',
       leaderName, leaderEmail, maxMembersPerGroup: maxMembers || 12,
       numberOfGroups: numberOfGroups || 1, description: description || '',
-      members: formattedMembers, status: 'active'
+      members: formattedMembers, status: 'active',
+      earnedRewardPoints: earnedRewardPoints || 0,
+      rewardPointsAwarded: false
     });
 
     // Create orders for each member
@@ -49,13 +52,25 @@ export const createEvent = async (req, res) => {
     
     await group.save();
 
+    // Update leader's reward points if earnedRewardPoints > 0
+    if (earnedRewardPoints > 0) {
+      const leader = await User.findOne({ email: leaderEmail.toLowerCase() });
+      if (leader) {
+        const canteenKey = `canteen_${group._id}`;
+        leader.rewardPoints.set(canteenKey, (leader.rewardPoints.get(canteenKey) || 0) + earnedRewardPoints);
+        await leader.save();
+      }
+    }
+
     res.status(201).json({ 
       success: true, 
       message: 'Event created successfully!', 
       group: {
         _id: group._id, eventName: group.eventName,
         eventDate: group.eventDate, inviteCode: group.inviteCode,
-        totalMembers: group.members.length
+        totalMembers: group.members.length,
+        earnedRewardPoints: earnedRewardPoints || 0,
+        rewardMessage: earnedRewardPoints > 0 ? `You earned ${earnedRewardPoints} reward points (Rs${earnedRewardPoints * 10})!` : null
       }
     });
   } catch (error) {
@@ -202,6 +217,30 @@ export const joinGroup = async (req, res) => {
     res.json({ success: true, message: 'Joined successfully!', token: order.tokenNumber });
   } catch (error) {
     console.error('Error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get reward points for a user
+export const getUserRewardPoints = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const totalPoints = Array.from(user.rewardPoints.values()).reduce((sum, points) => sum + points, 0);
+    
+    res.json({
+      success: true,
+      email: user.email,
+      rewardPoints: totalPoints,
+      pointsByCanteen: Object.fromEntries(user.rewardPoints)
+    });
+  } catch (error) {
+    console.error('Error fetching reward points:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
