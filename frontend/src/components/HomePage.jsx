@@ -3,20 +3,17 @@ import { Link } from 'react-router-dom';
 import { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight, Sun, Moon } from 'lucide-react';
 import Footer from "./Footer";
 import { useTheme } from '../contexts/ThemeContext';
+import ChatBot from "./AI/chatbot";
+import axios from '../lib/axios';
 
 const HomePage = () => {
   const videoRef = useRef(null);
   const { darkMode, toggleTheme } = useTheme();
+  const [categoryMenus, setCategoryMenus] = useState({});
+  const [loadingMenus, setLoadingMenus] = useState({});
   
   // Single video source
   const videoSource = 'images/3.mp4';
-
-  const scrollToMenu = () => {
-    const menuSection = document.getElementById("menu");
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   const categories = [
     { 
@@ -25,15 +22,17 @@ const HomePage = () => {
       icon: <Utensils className="w-6 h-6" />, 
       color: "text-orange-500",
       backgroundImage: "images/juse.jpg",
-      path: "/menu/juice-bar" 
+      path: "/menu/juice-bar",
+      canteen: "Juice Bar"
     },
     { 
-      name: "Basement Canteen", 
+      name: "Main Canteen", 
       items: 'Grab & Go', 
       icon: <Pizza className="w-6 h-6" />, 
       color: "text-yellow-600",
       backgroundImage: "images/2.jpg",
-      path: "/menu/basement"
+      path: "/menu/main",
+      canteen: "Main Canteen"
     },
     { 
       name: 'New Canteen', 
@@ -41,7 +40,8 @@ const HomePage = () => {
       icon: <Coffee className="w-6 h-6" />, 
       color: "text-amber-700",
       backgroundImage: "images/3.jpg",
-      path: "/menu/new-canteen"
+      path: "/menu/new-canteen",
+      canteen: "New Canteen"
     },
     { 
       name: 'Anohana Canteen', 
@@ -49,9 +49,42 @@ const HomePage = () => {
       icon: <Leaf className="w-6 h-6" />, 
       color: "text-green-500",
       backgroundImage: "images/4.jpg",
-      path: "/menu/anohana"
+      path: "/menu/anohana",
+      canteen: "Anohana Canteen"
     }
   ];
+
+  const scrollToMenu = () => {
+    const menuSection = document.getElementById("menu");
+    if (menuSection) {
+      menuSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Fetch menu items for each canteen
+  useEffect(() => {
+    const fetchAllMenus = async () => {
+      const menus = {};
+      const loading = {};
+
+      for (const category of categories) {
+        loading[category.canteen] = true;
+        try {
+          const response = await axios.get(`/api/menu/canteen/${encodeURIComponent(category.canteen)}`);
+          menus[category.canteen] = response.data.data || [];
+        } catch (error) {
+          console.error(`Error fetching menu for ${category.canteen}:`, error);
+          menus[category.canteen] = [];
+        }
+        loading[category.canteen] = false;
+      }
+
+      setCategoryMenus(menus);
+      setLoadingMenus(loading);
+    };
+
+    fetchAllMenus();
+  }, []);
 
   return (
     <div className={`min-h-screen ${
@@ -98,7 +131,7 @@ const HomePage = () => {
           <div className="flex gap-4 flex-wrap justify-center">
             <button
               onClick={scrollToMenu}
-              className="bg-gradient-to-r from-orange-500 to-emerald-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:from-orange-600 hover:to-emerald-600 transition-all shadow-xl flex items-center gap-2 hover:shadow-2xl hover:scale-[1.02]"
+              className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2"
             >
               <Utensils className="w-5 h-5" /> Order Now
             </button>
@@ -154,6 +187,96 @@ const HomePage = () => {
             </Link>
           ))}
         </div>
+
+        {/* Menu Items Preview */}
+        <div className="space-y-12 mt-12">
+          {categories.map((category) => (
+            <div key={category.canteen} className="border-t border-slate-200 dark:border-slate-700 pt-8">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-3">
+                <span className="text-orange-500">{category.icon}</span>
+                {category.name}
+              </h3>
+              
+              {loadingMenus[category.canteen] ? (
+                <div className="flex items-center justify-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                </div>
+              ) : categoryMenus[category.canteen]?.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {categoryMenus[category.canteen].slice(0, 6).map((item) => (
+                    <div
+                      key={item._id}
+                      className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                    >
+                      {item.image && (
+                        <div className="h-40 bg-gray-200 overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm line-clamp-2">
+                            {item.name}
+                          </h4>
+                          <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                            {item.refNumber}
+                          </span>
+                        </div>
+                        
+                        {item.description && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">
+                            {item.description}
+                          </p>
+                        )}
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                            Rs.{item.price}
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            {item.preparationTime} min
+                          </span>
+                        </div>
+
+                        {item.dietary && item.dietary.length > 0 && (
+                          <div className="flex gap-1 mt-2 flex-wrap">
+                            {item.dietary.slice(0, 2).map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                  No menu items available for this canteen
+                </div>
+              )}
+
+              {categoryMenus[category.canteen]?.length > 6 && (
+                <div className="text-center mt-6">
+                  <Link to={category.path}>
+                    <button className="bg-orange-500 text-white px-8 py-2 rounded-xl font-bold hover:bg-orange-600 transition-all">
+                      View All {categoryMenus[category.canteen].length} Items
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Promo Section - Orange-Green Gradient */}
@@ -194,7 +317,7 @@ const HomePage = () => {
               onClick={scrollToMenu}
               className="w-full bg-gradient-to-r from-orange-400 to-emerald-500 hover:from-orange-500 hover:to-emerald-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 active:scale-95"
             >
-              Add to Order - ₹199
+              Add to Order - $8.50
             </button>
           </div>
         </div>

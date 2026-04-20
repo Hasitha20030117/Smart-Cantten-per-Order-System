@@ -74,6 +74,7 @@ import paymentRoutes from "./routes/Canteen/paymentRoutes.js";
 import adminPaymentRoutes from "./routes/Canteen/adminPaymentRoutes.js";
 import receiptRoutes from "./routes/Canteen/receiptRoutes.js";
 import tokenRoutes from "./routes/Canteen/tokenRoutes.js";
+import menuRoutes from "./routes/Canteen/menuRoutes.js";
 import orderManagementRoutes from "./routes/OrderManagement/orderRoutes.js";
 import bulkOrderRoutes from "./routes/bulkOrder.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
@@ -84,6 +85,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminPaymentRoutes);
 app.use("/api/receipts", receiptRoutes);
 app.use("/api/tokens", tokenRoutes);
+app.use("/api/menu", menuRoutes);
 
 // ========== BULK ORDERING ROUTES ==========
 app.use("/api/bulk-order", bulkOrderRoutes);
