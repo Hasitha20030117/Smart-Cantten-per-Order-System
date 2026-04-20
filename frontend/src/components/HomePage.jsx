@@ -1,8 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';\nimport { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight } from 'lucide-react';\nimport Footer from "./Footer";
+import { Link } from 'react-router-dom';
+import { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight, Sun, Moon } from 'lucide-react';
+import Footer from "./Footer";
+import { useTheme } from '../contexts/ThemeContext';
 
-const CanteenHomepage = () => {
+const HomePage = () => {
   const videoRef = useRef(null);
+  const { darkMode, toggleTheme } = useTheme();
   
   // Single video source
   const videoSource = 'images/3.mp4';
@@ -201,4 +205,4 @@ const CanteenHomepage = () => {
   );
 };
 
-export default CanteenHomepage;
+export default HomePage;

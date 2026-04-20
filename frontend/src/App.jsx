@@ -1,4 +1,12 @@
-import {\n  BrowserRouter as Router,\n  Routes,\n  Route,\n  Navigate,\n  useLocation,\n} from "react-router-dom";\nimport { ThemeProvider } from "./contexts/ThemeContext";\nimport ChatBot from "./components/AI/chatbot";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import ChatBot from "./components/AI/chatbot";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
@@ -86,99 +94,105 @@ function App() {
   if (isCheckingAuth) return <LoadingSpinner />;
 
   return (
-    <Router>
-      <ConditionalNavbar />
-      
-      
-  
-      <Routes>
-       
+    <ThemeProvider>
+      <Router>
+        <ConditionalNavbar />
         
-        {/* Root Route - redirect admin automatically */}
-        <Route
-          path="/"
-          element={
-            isAuthenticated
-              ? user?.role === "admin"
-                ? <Navigate to="/admin/dashboard" replace />
+        <Routes>
+          {/* Root Route - redirect admin automatically */}
+          <Route
+            path="/"
+            element={
+              isAuthenticated
+                ? user?.role === "admin"
+                  ? <Navigate to="/admin/dashboard" replace />
+                  : <HomePage />
                 : <HomePage />
-              : <HomePage />
-          }
+            }
+          />
+
+          {/* Public Routes */}
+          <Route
+            path="/register"
+            element={
+              isAuthenticated
+                ? user?.role === "admin"
+                  ? <Navigate to="/admin/dashboard" replace />
+                  : <Navigate to="/" replace />
+                : <RegisterPage />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated
+                ? user?.role === "admin"
+                  ? <Navigate to="/admin/dashboard" replace />
+                  : <Navigate to="/" replace />
+                : <Login />
+            }
+          />
+          <Route path="/forget-password" element={<ForgotPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/ContactPage" element={<ContactPage />} />
+          <Route path="/FaqPage" element={<FaqPage />} />
+          <Route path="/AboutUsPage" element={<AboutUsPage />} />
+          <Route path="/canteen" element={<CanteenLanding />} />
+          <Route path="/canteen/pay/:orderId" element={<PayForToken />} />
+          <Route path="/canteen/pay/online/:paymentId" element={<OnlinePay />} />
+          <Route path="/canteen/pay/qr/:paymentId" element={<QrPay />} />
+          <Route path="/canteen/pay/slip/:paymentId" element={<SlipPay />} />
+          <Route path="/canteen/receipt/:paymentId" element={<Receipt />} />
+          <Route path="/canteen/my-payments" element={<MyPayments />} />
+          <Route path="/bulk-order" element={<BulkOrderPage />} />
+          <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
+          <Route path="/tokens" element={<TokenGenerationPage />} />
+          <Route path="/subscription" element={<SubscriptionPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/orders/create" element={<CreateOrderPage />} />
+          <Route path="/menu/juice-bar" element={<JuiceBar />} />
+          <Route path="/menu/basement" element={<Basement />} />
+          <Route path="/menu/new-canteen" element={<NewCanteen />} />
+          <Route path="/menu/anohana" element={<Anohana />} />
+
+          {/* Profile - Now Public for Demo */}
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/user-profile" element={<UserProfile />} />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin/dashboard/*"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/canteen/admin/payments"
+            element={
+              <AdminRoute>
+                <CanteenAdminPayments />
+              </AdminRoute>
+            }
+          />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+
+        <ChatBot />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: { background: "#363636", color: "#fff", dark: "dark:bg-slate-800 dark:text-white" },
+          }}
         />
-
-        {/* Public Routes */}
-        <Route
-          path="/register"
-          element={
-            isAuthenticated
-              ? user?.role === "admin"
-                ? <Navigate to="/admin/dashboard" replace />
-                : <Navigate to="/" replace />
-              : <RegisterPage />
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            isAuthenticated
-              ? user?.role === "admin"
-                ? <Navigate to="/admin/dashboard" replace />
-                : <Navigate to="/" replace />
-              : <Login />
-          }
-        />
-        <Route path="/forget-password" element={<ForgotPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-        <Route path="/ContactPage" element={<ContactPage />} />
-        <Route path="/FaqPage" element={<FaqPage />} />
-        <Route path="/AboutUsPage" element={<AboutUsPage />} />
-        <Route path="/canteen" element={<CanteenLanding />} />
-        <Route path="/canteen/pay/:orderId" element={<PayForToken />} />
-        <Route path="/canteen/pay/online/:paymentId" element={<OnlinePay />} />
-        <Route path="/canteen/pay/qr/:paymentId" element={<QrPay />} />
-        <Route path="/canteen/pay/slip/:paymentId" element={<SlipPay />} />
-        <Route path="/canteen/receipt/:paymentId" element={<Receipt />} />
-        <Route path="/canteen/my-payments" element={<MyPayments />} />
-        <Route path="/bulk-order" element={<BulkOrderPage />} />
-        <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
-        <Route path="/tokens" element={<TokenGenerationPage />} />
-        <Route path="/subscription" element={<SubscriptionPage />} />
-        <Route path="/orders" element={<OrdersPage />} />
-        <Route path="/orders/create" element={<CreateOrderPage />} />
-        <Route path="/menu/juice-bar" element={<JuiceBar />} />
-        <Route path="/menu/basement" element={<Basement />} />
-        <Route path="/menu/new-canteen" element={<NewCanteen />} />
-        <Route path="/menu/anohana" element={<Anohana />} />
-
-        {/* Profile - Now Public for Demo */}
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/user-profile" element={<UserProfile />} />
-
-
-        {/* Admin Routes */}
-        <Route
-          path="/admin/dashboard/*"
-          element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/canteen/admin/payments"
-          element={
-            <AdminRoute>
-              <CanteenAdminPayments />
-            </AdminRoute>
-          }
-        />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-
-        <ChatBot />\n        <Toaster\n          position="top-right"\n          toastOptions={{\n            duration: 3000,\n            style: { background: "#363636", color: "#fff", dark: "dark:bg-slate-800 dark:text-white" },\n          }}\n        />\n      </Router>\n    </ThemeProvider>\n  );\n
+      </Router>
+    </ThemeProvider>
+  );
 }
 
 export default App;

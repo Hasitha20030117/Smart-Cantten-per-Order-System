@@ -27,7 +27,7 @@ export const addUser = async (req, res) => {
       confirmPassword,
     } = req.body;
 
-    if(!firstName || !lastName || !email || !phoneNumber|| !address || !password || !confirmPassword){
+    if (!firstName || !lastName || !email || !phoneNumber || !address || !password || !confirmPassword) {
         throw new Error("All fields are Required");
     }
 
@@ -48,7 +48,7 @@ export const addUser = async (req, res) => {
 
     // Basic confirm password check (do NOT store it)
     if (password !== confirmPassword) {
-      return res.status(400).json({ status: "Passwords do not match" });
+      return res.status(400).json({ success: false, message: "Passwords do not match" });
     }
 
     // Hash password

@@ -76,7 +76,6 @@ function Chatbot() {
       }
 
       const response = await fetch(GEMINI_API_URL, requestOptions);
->>>>>>> 46cafd445f138af710f719f65dfa4215da4fafcf
       const data = await response.json();
       if(!response.ok) throw new Error(data.error.message || "Failed to fetch response");
       const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*|__|\*/g, '').trim();
@@ -152,12 +151,8 @@ function Chatbot() {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
 export default Chatbot;
-<<<<<<< HEAD
-
-=======
->>>>>>> 46cafd445f138af710f719f65dfa4215da4fafcf

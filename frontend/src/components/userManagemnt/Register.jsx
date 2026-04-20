@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/user";
+import toast from "react-hot-toast";
 import {
   Eye,
   EyeOff,
@@ -29,7 +30,7 @@ const Register = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const { signup, isLoading } = useAuthStore();
+  const { signup, isLoading, error } = useAuthStore();
   const navigate = useNavigate();
 
   
@@ -138,18 +139,38 @@ const Register = () => {
     if (!validateForm()) return;
 
     try {
+      // Trim all fields to remove leading/trailing whitespace
+      const trimmedData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        contact: formData.contact.trim(),
+        address: formData.address.trim(),
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+      };
+
+      // Validate trimmed data is not empty
+      if (!Object.values(trimmedData).every(val => val.length > 0)) {
+        toast.error("All fields are required");
+        return;
+      }
+
       await signup(
-        formData.firstName,
-        formData.lastName,
-        formData.email,
-        formData.contact,
-        formData.address,
-        formData.password,
-        formData.confirmPassword
+        trimmedData.firstName,
+        trimmedData.lastName,
+        trimmedData.email,
+        trimmedData.contact,
+        trimmedData.address,
+        trimmedData.password,
+        trimmedData.confirmPassword
       );
+      toast.success("Account created! Please verify your email.");
       navigate("/verify-email");
     } catch (err) {
+      const errorMsg = err?.response?.data?.message || error || "Signup failed. Please try again.";
       console.error("Signup failed:", err);
+      toast.error(errorMsg);
     }
   };
 

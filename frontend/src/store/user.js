@@ -15,18 +15,29 @@ export const useAuthStore = create((set) => ({
   signup: async (FirstName, LastName, Email, Contact, Address, password, confirmPassword) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post("/user/addUser", {
+      const payload = {
         firstName: FirstName,
         lastName: LastName,
         email: Email,
         phoneNumber: Contact,
         address: Address,
         password,
-        confirmPassword, // <-- send this
-      });
+        confirmPassword,
+      };
+      console.log("Signup payload:", payload);
+      
+      const response = await axios.post("/user/addUser", payload);
+      console.log("Signup response:", response.data);
       set({ user: response.data.user, isAuthenticated: true, isLoading: false });
     } catch (error) {
-      set({ error: error?.response?.data?.message || "Error signing up", isLoading: false }); // <-- safe optional chaining
+      const errorMessage = error?.response?.data?.message || error?.message || "Error signing up";
+      console.error("Signup error:", {
+        status: error?.response?.status,
+        message: errorMessage,
+        data: error?.response?.data,
+        fullError: error
+      });
+      set({ error: errorMessage, isLoading: false });
       throw error;
     }
   },
