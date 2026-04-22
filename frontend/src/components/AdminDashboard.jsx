@@ -17,8 +17,9 @@ import {
   Button,
   Avatar,
   Paper,
-  Grid
+  Grid,
 } from "@mui/material";
+
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
@@ -29,9 +30,10 @@ import {
   Settings as SettingsIcon,
   Inventory as InventoryIcon,
   Logout as LogoutIcon,
-  Fastfood as LogoIcon
+  Fastfood as LogoIcon,
 } from "@mui/icons-material";
 
+import { motion, AnimatePresence } from "framer-motion";
 import UserManagement from "./userManagemnt/userManagement";
 import { useAuthStore } from "../store/user";
 
@@ -58,51 +60,62 @@ const AdminDashboard = () => {
   ];
 
   const drawer = (
-    <Box sx={{ height: '100%', bgcolor: '#1A1A1A', color: 'white' }}>
-      <Toolbar sx={{ px: 2, py: 3, display: 'flex', gap: 1.5 }}>
-        <Avatar sx={{ bgcolor: '#FF8C42', width: 32, height: 32 }}>
-          <LogoIcon sx={{ fontSize: 20 }} />
+    <Box sx={{ height: "100%", bgcolor: "#111", color: "white" }}>
+      {/* Logo */}
+      <Toolbar sx={{ px: 2, py: 3, display: "flex", gap: 1.5 }}>
+        <Avatar sx={{ bgcolor: "#FF8C42" }}>
+          <LogoIcon />
         </Avatar>
-        <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
-          Sliit<span style={{ color: '#FF8C42' }}>Byte</span>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+          Sliit<span style={{ color: "#FF8C42" }}>Byte</span>
         </Typography>
       </Toolbar>
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
+
+      {/* Menu */}
       <List sx={{ px: 1.5, py: 2 }}>
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
+
           return (
-            <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+            <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
               <ListItemButton
+                component={motion.div}
+                whileHover={{ x: 6 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   navigate(item.path);
                   setMobileOpen(false);
                 }}
                 sx={{
-                  borderRadius: '12px',
-                  bgcolor: isActive ? 'rgba(255, 140, 66, 0.15)' : 'transparent',
-                  color: isActive ? '#FF8C42' : '#A0A0A0',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', color: '#fff' },
-                  transition: '0.2s ease',
+                  borderRadius: "12px",
+                  bgcolor: isActive ? "rgba(255,140,66,0.15)" : "transparent",
+                  color: isActive ? "#FF8C42" : "#aaa",
+                  transition: "0.3s",
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.08)",
+                    color: "#fff",
+                  },
                 }}
               >
-                <ListItemIcon sx={{ 
-                    minWidth: 40, 
-                    color: isActive ? '#FF8C42' : 'inherit' 
-                }}>
+                <ListItemIcon
+                  sx={{
+                    color: isActive ? "#FF8C42" : "inherit",
+                    minWidth: 40,
+                  }}
+                >
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText 
-                  primary={item.text} 
-                  primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: isActive ? 600 : 400 }} 
-                />
+                <ListItemText primary={item.text} />
               </ListItemButton>
             </ListItem>
           );
         })}
       </List>
-      
-      <Box sx={{ position: 'absolute', bottom: 20, width: '100%', px: 2 }}>
+
+      {/* Logout */}
+      <Box sx={{ position: "absolute", bottom: 20, width: "100%", px: 2 }}>
         <Button
           fullWidth
           variant="outlined"
@@ -113,7 +126,10 @@ const AdminDashboard = () => {
             logout?.();
             navigate("/login");
           }}
-          sx={{ borderRadius: '10px', textTransform: 'none' }}
+          sx={{
+            borderRadius: "10px",
+            "&:hover": { transform: "scale(1.05)" },
+          }}
         >
           Logout
         </Button>
@@ -122,116 +138,145 @@ const AdminDashboard = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#F8F9FA', minHeight: '100vh' }}>
+    <Box sx={{ display: "flex", bgcolor: "#f4f6f8", minHeight: "100vh" }}>
       <CssBaseline />
-      
+
       {/* Mobile AppBar */}
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(8px)',
-          color: '#1A1A1A',
-          boxShadow: 'none',
-          borderBottom: '1px solid #E0E0E0',
-          display: { sm: 'none' }
+          display: { sm: "none" },
+          bgcolor: "rgba(255,255,255,0.8)",
+          backdropFilter: "blur(10px)",
+          color: "#000",
         }}
       >
         <Toolbar>
-          <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2 }}>
+          <IconButton onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
-            Admin Panel
-          </Typography>
+          <Typography variant="h6">Admin Panel</Typography>
         </Toolbar>
       </AppBar>
 
-      {/* Navigation Drawer */}
-      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+      {/* Drawer */}
+      <Box component="nav" sx={{ width: { sm: drawerWidth } }}>
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, border: 'none' },
-          }}
+          sx={{ display: { xs: "block", sm: "none" } }}
         >
           {drawer}
         </Drawer>
+
         <Drawer
           variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, border: 'none', boxShadow: '10px 0 30px rgba(0,0,0,0.02)' },
-          }}
           open
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              border: "none",
+              boxShadow: "10px 0 30px rgba(0,0,0,0.05)",
+            },
+          }}
         >
           {drawer}
         </Drawer>
       </Box>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <Box
-        component="main"
+        component={motion.div}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
         sx={{
           flexGrow: 1,
           p: 4,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: { xs: 8, sm: 0 }
+          mt: { xs: 8, sm: 0 },
         }}
       >
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: { xs: 2, md: 4 }, 
-            borderRadius: '24px', 
-            minHeight: '85vh',
-            border: '1px solid #EDEDED'
+        <Paper
+          sx={{
+            p: 4,
+            borderRadius: "20px",
+            backdropFilter: "blur(10px)",
+            background: "rgba(255,255,255,0.7)",
+            border: "1px solid rgba(255,255,255,0.3)",
           }}
         >
-          <Routes>
-            <Route index element={<DashboardSummary />} />
-            <Route path="All-user" element={<UserManagement />} />
-            <Route path="products" element={<Typography variant="h5">Menu Management</Typography>} />
-            <Route path="inventory" element={<Typography variant="h5">Inventory Tracking</Typography>} />
-            <Route path="payment" element={<Typography variant="h5">Revenue & Payments</Typography>} />
-            <Route path="feedback" element={<Typography variant="h5">Customer Feedback</Typography>} />
-            <Route path="settings" element={<Typography variant="h5">System Settings</Typography>} />
-          </Routes>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route index element={<DashboardSummary />} />
+              <Route path="All-user" element={<UserManagement />} />
+              <Route path="products" element={<Page title="Menu Management" />} />
+              <Route path="inventory" element={<Page title="Inventory Tracking" />} />
+              <Route path="payment" element={<Page title="Revenue & Payments" />} />
+              <Route path="feedback" element={<Page title="Customer Feedback" />} />
+              <Route path="settings" element={<Page title="System Settings" />} />
+            </Routes>
+          </AnimatePresence>
         </Paper>
       </Box>
     </Box>
   );
 };
 
-// Simple Stats Component for Home
+const Page = ({ title }) => (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+  >
+    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+      {title}
+    </Typography>
+  </motion.div>
+);
+
+// Dashboard Summary
 const DashboardSummary = () => (
   <Box>
-    <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, color: '#1A1A1A' }}>
+    <Typography
+      variant="h4"
+      sx={{
+        fontWeight: 800,
+        background: "linear-gradient(90deg,#000,#555)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+      }}
+    >
       Morning, Admin 👋
     </Typography>
-    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 4 }}>
-      Here’s what’s happening at the Canteen today.
+
+    <Typography sx={{ mb: 4, color: "text.secondary" }}>
+      Here’s what’s happening today.
     </Typography>
-    
+
     <Grid container spacing={3}>
       {[
-        { label: 'Pending Orders', val: '12', color: '#FF8C42' },
-        { label: 'Completed Today', val: '148', color: '#4CAF50' },
-        { label: 'Low Stock Alert', val: '5', color: '#F44336' }
+        { label: "Pending Orders", val: "12", color: "#FF8C42" },
+        { label: "Completed", val: "148", color: "#4CAF50" },
+        { label: "Low Stock", val: "5", color: "#F44336" },
       ].map((stat) => (
         <Grid item xs={12} sm={4} key={stat.label}>
-          <Paper variant="outlined" sx={{ p: 3, borderRadius: '16px', borderLeft: `6px solid ${stat.color}` }}>
-            <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 700, color: 'text.secondary' }}>
-              {stat.label}
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{stat.val}</Typography>
-          </Paper>
+          <motion.div whileHover={{ scale: 1.05 }}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: "16px",
+                borderLeft: `6px solid ${stat.color}`,
+                "&:hover": {
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                },
+              }}
+            >
+              <Typography variant="caption">{stat.label}</Typography>
+              <Typography variant="h4">{stat.val}</Typography>
+            </Paper>
+          </motion.div>
         </Grid>
       ))}
     </Grid>
