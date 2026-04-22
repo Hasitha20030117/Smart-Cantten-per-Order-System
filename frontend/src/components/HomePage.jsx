@@ -4,6 +4,7 @@ import { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight, Sun, Moon } from 'l
 import Footer from "./Footer";
 import { useTheme } from '../contexts/ThemeContext';
 import ChatBot from "./AI/chatbot";
+import RewardBalanceCard from "./userManagemnt/RewardBalanceCard";
 import axios from '../lib/axios';
 
 const HomePage = () => {
@@ -142,6 +143,13 @@ const HomePage = () => {
               </button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Reward Balance Card Section */}
+      <section className="py-12 px-8 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-800/50">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <RewardBalanceCard variant="compact" />
         </div>
       </section>
 

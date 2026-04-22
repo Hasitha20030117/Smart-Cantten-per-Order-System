@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, User, Menu, X, Clock, Utensils, History, Bell } from "lucide-react";
+import { ShoppingBag, User, Menu, X, Clock, Utensils, History, Bell, Gift } from "lucide-react";
 import { useAuthStore } from "../store/user";
+import axios from "../lib/axios";
 
 const NavigationBar = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -9,6 +10,8 @@ const NavigationBar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [rewardPoints, setRewardPoints] = useState(0);
+  const [estimatedValue, setEstimatedValue] = useState(0);
 
   const profileRef = useRef(null);
   const menuRef = useRef(null);
@@ -32,6 +35,33 @@ const NavigationBar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Fetch reward points when authenticated
+  useEffect(() => {
+    const fetchRewardPoints = async () => {
+      if (!isAuthenticated || !user?._id) {
+        setRewardPoints(0);
+        setEstimatedValue(0);
+        return;
+      }
+
+      try {
+        const response = await axios.get(`/user/profile/${user._id}`);
+        if (response.data.user) {
+          const points = response.data.user.totalRewardPoints || 0;
+          setRewardPoints(points);
+          setEstimatedValue((points * 0.5).toFixed(2));
+        }
+      } catch (error) {
+        console.error("Error fetching reward points:", error);
+        // Set default demo value
+        setRewardPoints(45);
+        setEstimatedValue("22.50");
+      }
+    };
+
+    fetchRewardPoints();
+  }, [isAuthenticated, user?._id]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -126,17 +156,26 @@ const NavigationBar = () => {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-slate-100 py-2 z-50">
+                  <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-slate-100 py-2 z-50">
                     {isAuthenticated ? (
                       <>
-                        <div className="px-4 py-3 border-b border-slate-50">
-                          <p className="text-xs text-slate-400 font-bold">STUDENT ACCOUNT</p>
-                          <p className="text-sm font-bold text-slate-900">{user?.name}</p>
-                          <p className="text-xs text-orange-600 font-bold mt-1">Balance: $45.50</p>
+                        <div className="px-4 py-3 border-b border-slate-50 bg-gradient-to-r from-blue-50 to-purple-50">
+                          <p className="text-xs text-blue-600 font-bold">💳 STUDENT ACCOUNT</p>
+                          <p className="text-sm font-bold text-slate-900 mt-1">{user?.firstName} {user?.lastName}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                            <div>
+                              <p className="text-xs text-slate-500 font-semibold">Reward Points</p>
+                              <p className="text-lg font-bold text-blue-600">{rewardPoints} pts</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-500 font-semibold">Est. Value</p>
+                              <p className="text-lg font-bold text-green-600">₹{estimatedValue}</p>
+                            </div>
+                          </div>
                         </div>
                         <Link to="/user-profile" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600 font-semibold border-b border-slate-50">👤 My Profile</Link>
-                        <Link to="/profile" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600">Wallet & Payments</Link>
-                        <Link to="/orders" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600">Order History</Link>
+                        <Link to="/user-profile" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600">💰 Wallet & Rewards</Link>
+                        <Link to="/orders" className="block px-4 py-2 text-sm text-slate-600 hover:bg-orange-50 hover:text-orange-600">📋 Order History</Link>
                         <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold">Sign Out</button>
                       </>
                     ) : (

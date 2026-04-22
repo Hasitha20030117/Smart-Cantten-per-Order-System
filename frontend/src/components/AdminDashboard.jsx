@@ -109,6 +109,7 @@ const AdminDashboard = () => {
           color="error"
           startIcon={<LogoutIcon />}
           onClick={() => {
+            localStorage.removeItem("ADMIN_TEST_MODE");
             logout?.();
             navigate("/login");
           }}
