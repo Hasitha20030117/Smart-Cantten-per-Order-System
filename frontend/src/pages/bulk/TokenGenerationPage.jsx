@@ -142,29 +142,25 @@ const TokenGenerationPage = () => {
 
     const allOrderIds = tokens.filter(t => t.orderId).map(t => t.orderId);
     
-    if (allOrderIds.length > 0) {
-      navigate(`/canteen/pay/bulk-${Date.now()}`, {
-        state: {
-          orderData: {
-            _id: `bulk-group-${Date.now()}`,
-            tokenRef: `GROUP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-            totalAmount: totalDue,
-            items: tokens.map((token) => ({
-              name: `${token.name} - ${token.mealSelection?.name || "Meal"}`,
-              qty: 1,
-              price: Number(token.mealSelection?.price || 0),
-            })),
-            source: "bulk-group",
-            eventName: eventDetails?.name || "Bulk Event",
-            orderIds: allOrderIds,
-          },
+    // Always navigate to payment page with bulk data
+    navigate(`/canteen/pay/bulk-${Date.now()}`, {
+      state: {
+        orderData: {
+          _id: `bulk-group-${Date.now()}`,
+          tokenRef: `GROUP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+          totalAmount: totalDue,
+          items: tokens.map((token) => ({
+            name: `${token.name} - ${token.mealSelection?.name || "Meal"}`,
+            qty: 1,
+            price: Number(token.mealSelection?.price || 0),
+          })),
+          source: "bulk-group",
+          eventName: eventDetails?.name || "Bulk Event",
+          groupId: eventDetails?._id,
+          orderIds: allOrderIds,
         },
-      });
-    } else {
-      toast.success(`Total Due: $${totalDue.toFixed(2)} - Process payment for all members`);
-      // Update all tokens to paid
-      setTokens(prev => prev.map(t => ({ ...t, paymentStatus: 'paid' })));
-    }
+      },
+    });
   };
 
   useEffect(() => {
