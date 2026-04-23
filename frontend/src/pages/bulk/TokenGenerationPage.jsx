@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Download, Copy, CheckCircle, Users, Calendar, Utensils, ArrowLeft, CreditCard, Loader2 } from 'lucide-react';
+import { Download, Copy, CheckCircle, Users, Calendar, Utensils, ArrowLeft, CreditCard, Loader2, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from '../../lib/axios';
 
@@ -11,12 +11,16 @@ const TokenGenerationPage = () => {
   const [loading, setLoading] = useState(true);
   const [copiedToken, setCopiedToken] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
+  const [cancelConfirm, setCancelConfirm] = useState(null);
   const autoStartedPaymentRef = useRef(false);
 
   useEffect(() => {
     const createOrders = async () => {
       const members = location.state?.members || [];
       const eventInfo = location.state?.eventDetails || location.state?.groupInfo || null;
+      
+      console.log('Event Info:', eventInfo);
+      console.log('Group ID from state:', eventInfo?._id);
       
       setEventDetails(eventInfo);
       
@@ -39,7 +43,7 @@ const TokenGenerationPage = () => {
                 name: member.name,
                 email: member.email,
                 mealSelection: selectedMeal || { name: member.meal || "Meal", price: 0 },
-                paymentStatus: "pending",
+                paymentStatus: member.paymentStatus || "pending",
                 status: 'active'
               };
             }
@@ -129,7 +133,7 @@ const TokenGenerationPage = () => {
         },
       });
     } else {
-      toast.success(`Payment for ${token.name} - Amount: $${token.mealSelection?.price}`);
+      toast.success(`Payment for ${token.name} - Amount: Rs ${token.mealSelection?.price}`);
       // Update payment status locally
       setTokens(prev => prev.map(t => 
         t.id === token.id ? { ...t, paymentStatus: 'paid' } : t
@@ -142,7 +146,6 @@ const TokenGenerationPage = () => {
 
     const allOrderIds = tokens.filter(t => t.orderId).map(t => t.orderId);
     
-    // Always navigate to payment page with bulk data
     navigate(`/canteen/pay/bulk-${Date.now()}`, {
       state: {
         orderData: {
@@ -163,19 +166,22 @@ const TokenGenerationPage = () => {
     });
   };
 
-  useEffect(() => {
-    if (
-      loading ||
-      autoStartedPaymentRef.current ||
-      !location.state?.autoStartPayment ||
-      tokens.length === 0
-    ) {
-      return;
-    }
+  // Cancel/Delete functionality
+  const handleCancelToken = (token) => {
+    setCancelConfirm(token.id);
+  };
 
-    autoStartedPaymentRef.current = true;
-    handlePayAll();
-  }, [loading, tokens, location.state]);
+  const confirmCancelToken = () => {
+    if (cancelConfirm) {
+      setTokens(prev => prev.filter(token => token.id !== cancelConfirm));
+      setCancelConfirm(null);
+      toast.success("Token cancelled successfully!");
+    }
+  };
+
+  const cancelDelete = () => {
+    setCancelConfirm(null);
+  };
 
   const handlePrint = () => {
     window.print();
@@ -265,7 +271,7 @@ const TokenGenerationPage = () => {
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-orange-600" />
                   <span className="text-gray-700">
-                    <strong>Event:</strong> {eventDetails?.name || 'Sliit Smart Canteen'}
+                    <strong>Event:</strong> {eventDetails?.name || location.state?.eventDetails?.name || 'Smart Canteen'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -355,17 +361,47 @@ const TokenGenerationPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      {token.paymentStatus === 'pending' ? (
-                        <button 
-                          onClick={() => handleSinglePayment(token)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm"
-                        >
-                          <CreditCard className="w-4 h-4" /> Pay Now
-                        </button>
+                      {cancelConfirm === token.id ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={confirmCancelToken}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-xs"
+                          >
+                            <CheckCircle className="w-3 h-3" /> Yes
+                          </button>
+                          <button
+                            onClick={cancelDelete}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-xs"
+                          >
+                            <X className="w-3 h-3" /> No
+                          </button>
+                        </div>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm">
-                          <CheckCircle className="w-4 h-4" /> Paid
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {token.paymentStatus === 'pending' && (
+                            <>
+                              <button 
+                                onClick={() => handleCancelToken(token)}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-xs"
+                              >
+                                <Trash2 className="w-3 h-3" /> Cancel
+                              </button>
+                            </>
+                          )}
+                          {token.paymentStatus === 'pending' && (
+                            <button 
+                              onClick={() => handleSinglePayment(token)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm"
+                            >
+                              <CreditCard className="w-4 h-4" /> Pay Now
+                            </button>
+                          )}
+                          {token.paymentStatus === 'paid' && (
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm">
+                              <CheckCircle className="w-4 h-4" /> Paid
+                            </span>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
