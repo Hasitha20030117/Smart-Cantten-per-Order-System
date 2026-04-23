@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import Order from "../../models/Canteen/Order.js";
 import Payment from "../../models/Canteen/Payment.js";
+import BulkOrder from "../../models/Order.js";
 
 const normalizeItems = (items = []) =>
   items
@@ -78,7 +79,7 @@ export const startPayment = async (req, res) => {
       studentId: req.user?._id,
       customerName: orderData?.customerName || null,
       customerEmail: orderData?.customerEmail || null,
-      sourceOrderId: orderData?._id || null,
+      sourceOrderId: orderData?.groupId || orderData?._id || null,
       sourceType: orderData?.source || "canteen-payment",
       items: normalizedItems,
       totalAmount: normalizedTotal,
@@ -141,6 +142,14 @@ export const confirmOnlinePayment = async (req, res) => {
     const order = payment.orderId
       ? await Order.findByIdAndUpdate(payment.orderId, { status: "PAID" }, { new: true })
       : null;
+
+    // Update bulk orders if this is a bulk payment
+    if (order && order.sourceType === "bulk-group" && order.sourceOrderId) {
+      await BulkOrder.updateMany(
+        { groupId: order.sourceOrderId, status: { $ne: 'cancelled' } },
+        { status: 'confirmed' }
+      );
+    }
 
     res.json({
       success: true,

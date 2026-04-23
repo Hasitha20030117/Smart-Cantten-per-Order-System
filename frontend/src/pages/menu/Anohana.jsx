@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axiosInstance from '../../lib/axios';
+import toast from 'react-hot-toast';
 import { ShoppingCart, Minus, Plus, ArrowLeft } from 'lucide-react';
 
 const Anohana = () => {
+  const navigate = useNavigate();
   const [cart, setCart] = useState([]);
 
   const menuItems = [
@@ -40,19 +43,56 @@ const Anohana = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/orders', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(orderData)
-      });
-      
-      const result = await response.json();
-      if (result.tokenNumber) {
-        alert(`Order placed! Token #${result.tokenNumber}`);
+      const response = await axiosInstance.post('/api/orders', orderData);
+      const result = response.data || {};
+
+      if (result.order && result.order._id) {
+        navigate(`/canteen/pay/${result.order._id}`, {
+          state: {
+            orderData: {
+              _id: result.order._id,
+              tokenRef: `TOKEN-${result.tokenNumber}`,
+              totalAmount: getTotal(),
+              items: cart.map(item => ({ name: item.name, qty: item.quantity, price: item.price })),
+              customerName: 'Customer',
+              source: 'menu-order'
+            }
+          }
+        });
         setCart([]);
+      } else if (result.tokenNumber) {
+        navigate(`/canteen/pay/${result.tokenNumber}`, {
+          state: {
+            orderData: {
+              _id: result.order?._id || `menu-${Date.now()}`,
+              tokenRef: `TOKEN-${result.tokenNumber}`,
+              totalAmount: getTotal(),
+              items: cart.map(item => ({ name: item.name, qty: item.quantity, price: item.price })),
+              customerName: 'Customer',
+              source: 'menu-order'
+            }
+          }
+        });
+        setCart([]);
+      } else {
+        toast.error('Order failed to return expected data');
       }
     } catch (error) {
-      alert('Order failed');
+      console.error('Place order error:', error);
+      toast('Opening payment with current cart');
+      navigate(`/canteen/pay/menu-${Date.now()}`, {
+        state: {
+          orderData: {
+            _id: `menu-${Date.now()}`,
+            tokenRef: `MENU-${Date.now()}`,
+            totalAmount: getTotal(),
+            items: cart.map(item => ({ name: item.name, qty: item.quantity, price: item.price })),
+            customerName: 'Customer',
+            source: 'menu-order'
+          }
+        }
+      });
+      setCart([]);
     }
   };
 

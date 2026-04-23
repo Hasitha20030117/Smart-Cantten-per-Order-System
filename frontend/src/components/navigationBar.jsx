@@ -26,7 +26,7 @@ const NavigationBar = () => {
     { name: "Lunch", href: "/lunch" },
     { name: "Snacks", href: "/snacks" },
     { name: "Bulk Events", href: "/bulk-order" },
-    { name: "Token Pay", href: "/canteen" },
+    //{ name: "Token Pay", href: "/canteen" },
     { name: "Pre-Order Special", href: "/preorder", special: true },
   ];
 
