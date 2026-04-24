@@ -29,15 +29,32 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (_req, file, cb) => {
-  const allowedMimeTypes = ["image/jpeg", "image/png", "application/pdf"];
-  const allowedExtensions = [".jpg", ".jpeg", ".png", ".pdf"];
+  // Accept common image formats and PDF. Some mobile devices use webp/heic/heif.
+  const allowedMimeTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+    "application/pdf",
+  ];
+  const allowedExtensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+    ".heic",
+    ".heif",
+    ".pdf",
+  ];
+
   const extname = path.extname(file.originalname).toLowerCase();
 
   if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(extname)) {
     return cb(null, true);
   }
 
-  cb(new Error("Only .jpg, .jpeg, .png, and .pdf files are allowed"));
+  cb(new Error("Only image (jpg,jpeg,png,webp,heic) or pdf files are allowed"));
 };
 
 const upload = multer({
