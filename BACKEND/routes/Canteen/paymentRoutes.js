@@ -13,7 +13,8 @@ import { optionalAuth } from "../../middleware/Canteen/optionalAuth.js";
 
 const router = express.Router();
 
-const uploadDir = path.join(process.cwd(), "BACKEND", process.env.UPLOAD_DIR || "uploads");
+const uploadDir = path.join(process.cwd(), process.env.UPLOAD_DIR || "uploads");
+console.log('🔁 paymentRoutes uploadDir =', uploadDir);
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }

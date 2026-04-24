@@ -188,7 +188,7 @@ export const uploadProof = async (req, res) => {
 
     if (payment.proofUrl) {
       const relativePath = payment.proofUrl.replace(/^\//, "");
-      const oldPath = path.join(process.cwd(), "BACKEND", relativePath);
+      const oldPath = path.join(process.cwd(), relativePath);
       if (fs.existsSync(oldPath)) {
         fs.unlinkSync(oldPath);
       }

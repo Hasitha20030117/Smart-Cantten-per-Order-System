@@ -33,6 +33,7 @@ import {
 } from "@mui/icons-material";
 
 import UserManagement from "./userManagemnt/userManagement";
+import CanteenAdminPayments from "../pages/canteen/AdminPayments";
 import { useAuthStore } from "../store/user";
 
 const drawerWidth = 260;
@@ -198,7 +199,7 @@ const AdminDashboard = () => {
             <Route path="All-user" element={<UserManagement />} />
             <Route path="products" element={<Typography variant="h5">Menu Management</Typography>} />
             <Route path="inventory" element={<Typography variant="h5">Inventory Tracking</Typography>} />
-            <Route path="payment" element={<Typography variant="h5">Revenue & Payments</Typography>} />
+            <Route path="payment" element={<CanteenAdminPayments />} />
             <Route path="feedback" element={<Typography variant="h5">Customer Feedback</Typography>} />
             <Route path="settings" element={<Typography variant="h5">System Settings</Typography>} />
           </Routes>

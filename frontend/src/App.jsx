@@ -28,6 +28,7 @@ import SlipPay from "./pages/canteen/SlipPay";
 import Receipt from "./pages/canteen/Receipt";
 import MyPayments from "./pages/canteen/MyPayments";
 import CanteenAdminPayments from "./pages/canteen/AdminPayments";
+import AdminLogin from "./pages/AdminLogin";
 import BulkOrderPage from "./pages/bulk/BulkOrderPage";
 import MealSelectionPage from "./pages/bulk/MealSelectionPage";
 import SubscriptionPage from "./pages/bulk/SubscriptionPage";
@@ -63,7 +64,7 @@ const ConditionalNavbar = () => {
 
   const hideNavbarRoutes = [
     "/admin/dashboard", // hide on admin dashboard
-    "/canteen/admin/payments",
+    "/admin/payments",
   ];
 
   const isResetPasswordRoute = location.pathname.startsWith("/reset-password/");
@@ -152,6 +153,8 @@ function App() {
         <Route path="/menu/new-canteen" element={<NewCanteen />} />
         <Route path="/menu/anohana" element={<Anohana />} />
 
+        <Route path="/admin-login" element={<AdminLogin />} />
+
         {/* Profile - Now Public for Demo */}
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/user-profile" element={<UserProfile />} />
@@ -167,10 +170,10 @@ function App() {
           }
         />
         <Route
-          path="/canteen/admin/payments"
+          path="/admin/payments"
           element={
             <AdminRoute>
-              <CanteenAdminPayments />
+              <Navigate to="/admin/dashboard/payment" replace />
             </AdminRoute>
           }
         />

@@ -34,7 +34,7 @@ function CanteenLanding() {
             </Link>
             {user?.role === "admin" && (
               <Link
-                to="/canteen/admin/payments"
+                to="/admin/payments"
                 className="rounded-2xl border border-accent-green/50 bg-accent-green/25 px-7 py-4 font-semibold text-slate-900 transition-colors hover:bg-accent-green/40"
               >
                 Admin Verification

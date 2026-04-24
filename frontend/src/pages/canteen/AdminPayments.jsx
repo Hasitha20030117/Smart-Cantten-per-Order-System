@@ -176,21 +176,24 @@ function AdminPayments() {
 
                   <div>
                     {payment.proofUrl ? (
-                      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-3">
-                        <img
-                          src={`${API_BASE_URL}${payment.proofUrl}`}
-                          alt="Payment proof"
-                          className="w-full rounded-2xl"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => window.open(`${API_BASE_URL}${payment.proofUrl}`, "_blank")}
-                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700 transition-colors hover:border-slate-400"
-                        >
-                          <Eye size={18} />
-                          View Full Proof
-                        </button>
-                      </div>
+                      (() => {
+                        const proofUrl = payment.proofUrl.startsWith("http")
+                          ? payment.proofUrl
+                          : `${API_BASE_URL}${payment.proofUrl}`;
+                        return (
+                          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-3">
+                            <img src={proofUrl} alt="Payment proof" className="w-full rounded-2xl" />
+                            <button
+                              type="button"
+                              onClick={() => window.open(proofUrl, "_blank")}
+                              className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700 transition-colors hover:border-slate-400"
+                            >
+                              <Eye size={18} />
+                              View Full Proof
+                            </button>
+                          </div>
+                        );
+                      })()
                     ) : (
                       <div className="flex h-full min-h-[220px] items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 text-center text-slate-500">
                         No proof uploaded
