@@ -17,6 +17,11 @@ const MealSelectionPage = () => {
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [activeMember, setActiveMember] = useState(null);
 
+  // Function to add 50 LKR to price
+  const addFiftyLKR = (price) => {
+    return price + 50;
+  };
+
   useEffect(() => {
     if (groupId) {
       fetchGroupData();
@@ -73,7 +78,12 @@ const MealSelectionPage = () => {
   const fetchMenu = async () => {
     try {
       const response = await axios.get('http://localhost:5050/api/bulk-order/menu');
-      setMenu(response.data);
+      // Add 50 LKR to each menu item price
+      const updatedMenu = response.data.map(item => ({
+        ...item,
+        price: addFiftyLKR(item.price)
+      }));
+      setMenu(updatedMenu);
     } catch (error) {
       console.error('Error fetching menu:', error);
       toast.error('Failed to load menu. Please refresh the page.');
@@ -197,6 +207,16 @@ const MealSelectionPage = () => {
     }
   };
 
+  // Format price in LKR
+  const formatLKR = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
@@ -274,7 +294,7 @@ const MealSelectionPage = () => {
                 <span className="font-semibold">🎉 You earned {earnedPoints} reward points!</span>
                 <Gift className="w-5 h-5" />
               </div>
-              <p className="text-sm text-center mt-1">Worth Rs{(earnedPoints * 10).toFixed(0)} - Redeemable on future orders!</p>
+              <p className="text-sm text-center mt-1">Worth {formatLKR(earnedPoints * 10)} - Redeemable on future orders!</p>
             </div>
           )}
         </div>
@@ -336,7 +356,7 @@ const MealSelectionPage = () => {
                           {hasSelected && (
                             <div className="mt-2">
                               <span className="text-xs text-green-600 font-medium">
-                                ✓ Selected: {selectedMeals[member.email].name}
+                                ✓ Selected: {selectedMeals[member.email].name} ({formatLKR(selectedMeals[member.email].price)})
                               </span>
                             </div>
                           )}
@@ -539,7 +559,7 @@ const MealSelectionPage = () => {
                               <h4 className="font-semibold text-gray-800">{item.name}</h4>
                               <p className="text-xs text-gray-500 mt-1">{item.description}</p>
                               <div className="flex items-center justify-between mt-2">
-                                <span className="text-orange-600 font-bold">₹{item.price}</span>
+                                <span className="text-orange-600 font-bold">{formatLKR(item.price)}</span>
                                 {item.preparationTime && (
                                   <span className="text-xs text-gray-400 flex items-center gap-1">
                                     <Clock className="w-3 h-3" /> {item.preparationTime}min
@@ -575,7 +595,7 @@ const MealSelectionPage = () => {
                           <div className="text-right">
                             {hasSelected ? (
                               <span className="text-green-600 text-sm">
-                                ✓ {selectedMeals[member.email].name} - ₹{selectedMeals[member.email].price}
+                                ✓ {selectedMeals[member.email].name} - {formatLKR(selectedMeals[member.email].price)}
                               </span>
                             ) : (
                               <span className="text-orange-500 text-sm animate-pulse">⏳ Pending selection</span>
