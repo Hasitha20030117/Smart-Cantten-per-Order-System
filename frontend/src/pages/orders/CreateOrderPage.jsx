@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "../../lib/axios";
-
 import { useAuthStore } from "../../store/user";
 
 const CANTEENS = ["Juice Bar", "Basement Canteen", "New Canteen", "Anohana Canteen"];
@@ -33,9 +32,15 @@ function CreateOrderPage() {
     customerName: "",
     canteen: "New Canteen",
     timeSlot: "",
-    items: [emptyItem],
+    items: [{ ...emptyItem }],
   });
   const [errors, setErrors] = useState({});
+
+  // Debug - log when component mounts
+  useEffect(() => {
+    console.log("CreateOrderPage mounted");
+    console.log("User from auth:", user);
+  }, [user]);
 
   // Fetch menus for all canteens
   useEffect(() => {
@@ -183,10 +188,14 @@ function CreateOrderPage() {
   };
 
   const addItem = () => {
-    setFormData((current) => ({ ...current, items: [...current.items, emptyItem] }));
+    setFormData((current) => ({ ...current, items: [...current.items, { ...emptyItem }] }));
   };
 
   const removeItem = (index) => {
+    if (formData.items.length === 1) {
+      toast.error("At least one item is required");
+      return;
+    }
     setFormData((current) => ({
       ...current,
       items: current.items.filter((_, itemIndex) => itemIndex !== index),
@@ -204,17 +213,19 @@ function CreateOrderPage() {
         ...current,
         items: current.items.map((item, i) =>
           i === existingItemIndex
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: (item.quantity || 0) + 1, price: menuItem.price }
             : item
         ),
       }));
       toast.success(`${menuItem.name} quantity increased`);
     } else {
-      // New item
+      // Remove empty placeholder if it exists
+      const filteredItems = formData.items.filter((item) => item.name !== "");
+      
       setFormData((current) => ({
         ...current,
         items: [
-          ...current.items.filter((item) => item.name !== ""), // Remove empty placeholder
+          ...filteredItems,
           {
             name: menuItem.name,
             quantity: 1,
@@ -228,6 +239,8 @@ function CreateOrderPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    console.log("Form submitted", formData);
 
     // Validate all fields
     const itemErrors = validateItems();
@@ -243,16 +256,23 @@ function CreateOrderPage() {
       return;
     }
 
-    const cleanedItems = formData.items.map((item) => ({
-      name: item.name.trim(),
-      quantity: Number(item.quantity),
-      price: Number(item.price),
-    }));
+    const cleanedItems = formData.items
+      .filter((item) => item.name.trim() !== "")
+      .map((item) => ({
+        name: item.name.trim(),
+        quantity: Number(item.quantity),
+        price: Number(item.price),
+      }));
 
     const totalAmount = cleanedItems.reduce(
       (sum, item) => sum + item.quantity * item.price,
       0
     );
+
+    if (cleanedItems.length === 0) {
+      toast.error("Please add at least one item");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -265,7 +285,9 @@ function CreateOrderPage() {
         ...(user?._id && { userId: user._id }),
       });
 
+      console.log("Order created:", response.data);
       toast.success(`Order placed! Token ${response.data.tokenNumber}`);
+      
       navigate(`/canteen/pay/${response.data.order._id}`, {
         state: {
           orderData: {
@@ -289,6 +311,14 @@ function CreateOrderPage() {
       setLoading(false);
     }
   };
+
+  // Fix: Fixed the select options - they were showing wrong values
+  const canteenOptions = [
+    { value: "Main Canteen", label: "Main Canteen" },
+    { value: "Basement Canteen", label: "Basement Canteen" },
+    { value: "New Canteen", label: "New Canteen" },
+    { value: "Anohana Canteen", label: "Anohana Canteen" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 px-4 py-12">
@@ -326,10 +356,11 @@ function CreateOrderPage() {
               onChange={handleMainChange}
               className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-orange-500"
             >
-              <option>Main Canteen</option>
-              <option>Canteen2</option>
-              <option>Canteen3</option>
-              <option>Canteen4</option>
+              {canteenOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
             <input
               name="timeSlot"
@@ -376,6 +407,7 @@ function CreateOrderPage() {
                     <input
                       type="number"
                       min="0"
+                      step="10"
                       value={item.price}
                       onChange={(event) => handleItemChange(index, "price", event.target.value)}
                       className={`w-full rounded-2xl border px-4 py-3 outline-none focus:border-orange-500 ${
@@ -389,7 +421,7 @@ function CreateOrderPage() {
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="rounded-2xl border border-red-200 px-4 py-3 text-red-500"
+                    className="rounded-2xl border border-red-200 px-4 py-3 text-red-500 hover:bg-red-50 transition"
                   >
                     Remove
                   </button>
@@ -415,14 +447,14 @@ function CreateOrderPage() {
             <button
               type="button"
               onClick={addItem}
-              className="rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700"
+              className="rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50 transition"
             >
               Add Item
             </button>
             <button
               type="submit"
               disabled={loading || !isFormValid()}
-              className="rounded-2xl bg-orange-500 px-6 py-3 font-semibold text-white disabled:opacity-60 disabled:cursor-not-allowed"
+              className="rounded-2xl bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? "Creating..." : "Create Order"}
             </button>

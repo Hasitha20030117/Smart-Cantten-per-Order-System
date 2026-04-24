@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Utensils, Clock, Pizza, Coffee, Leaf, ChevronRight, Sun, Moon } from 'lucide-react';
 import Footer from "./Footer";
 import { useTheme } from '../contexts/ThemeContext';
@@ -9,6 +9,7 @@ import axios from '../lib/axios';
 
 const HomePage = () => {
   const videoRef = useRef(null);
+  const navigate = useNavigate();
   const { darkMode, toggleTheme } = useTheme();
   const [categoryMenus, setCategoryMenus] = useState({});
   const [loadingMenus, setLoadingMenus] = useState({});
@@ -60,6 +61,12 @@ const HomePage = () => {
     if (menuSection) {
       menuSection.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  // Navigate to Create Order page - FIXED: changed from '/create-order' to '/orders/create'
+  const handleOrderNow = () => {
+    console.log("Navigating to /orders/create");
+    navigate('/orders/create');
   };
 
   // Fetch menu items for each canteen
@@ -131,7 +138,7 @@ const HomePage = () => {
           </p>
           <div className="flex gap-4 flex-wrap justify-center">
             <button
-              onClick={scrollToMenu}
+              onClick={handleOrderNow}
               className="bg-orange-500 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2"
             >
               <Utensils className="w-5 h-5" /> Order Now
