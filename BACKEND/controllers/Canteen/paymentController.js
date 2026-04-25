@@ -144,6 +144,10 @@ export const confirmOnlinePayment = async (req, res) => {
       return res.status(400).json({ success: false, message: "paymentId is required" });
     }
 
+    if (!paymentId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ success: false, message: "Invalid paymentId format" });
+    }
+
     const payment = await Payment.findById(paymentId);
     if (!payment) {
       return res.status(404).json({ success: false, message: "Payment not found" });
@@ -164,11 +168,15 @@ export const confirmOnlinePayment = async (req, res) => {
       : null;
 
     // Update bulk orders if this is a bulk payment
-    if (order && order.sourceType === "bulk-group" && order.sourceOrderId) {
-      await BulkOrder.updateMany(
-        { groupId: order.sourceOrderId, status: { $ne: 'cancelled' } },
-        { status: 'confirmed' }
-      );
+    if (order && order.sourceType === "bulk-group" && order.sourceOrderId && order.sourceOrderId !== "null") {
+      try {
+        await BulkOrder.updateMany(
+          { groupId: order.sourceOrderId, status: { $ne: 'cancelled' } },
+          { status: 'confirmed' }
+        );
+      } catch (err) {
+        console.warn("Failed to update bulk orders:", err);
+      }
     }
 
     res.json({
