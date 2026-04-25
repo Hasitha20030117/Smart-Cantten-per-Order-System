@@ -171,10 +171,7 @@ const Login = () => {
                 <p className="text-center text-xs text-gray-500 mb-3">🧪 Test Admin Access</p>
                 <button
                   type="button"
-                  onClick={() => {
-                    localStorage.setItem("ADMIN_TEST_MODE", "true");
-                    navigate("/admin/dashboard");
-                  }}
+                  onClick={() => navigate("/admin-quick-access")}
                   className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm"
                 >
                   🔑 Quick Access Admin Dashboard

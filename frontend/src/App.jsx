@@ -18,6 +18,7 @@ import ForgotPassword from "./components/userManagemnt/ForgotPassword";
 import UserProfile from "./components/userManagemnt/UserProfile";
 import VerifyEmail from "./components/userManagemnt/VerifyEmail";
 import ResetPasswordPage from "./components/userManagemnt/ResetPasswordPage";
+import AdminQuickAccess from "./components/userManagemnt/AdminQuickAccess";
 import HomePage from "./components/HomePage"
 import ContactPage from "./components/ContactPage";
 import FaqPage from "./components/FaqPage";
@@ -142,6 +143,7 @@ function App() {
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/admin-quick-access" element={<AdminQuickAccess />} />
           <Route path="/ContactPage" element={<ContactPage />} />
           <Route path="/FaqPage" element={<FaqPage />} />
           <Route path="/AboutUsPage" element={<AboutUsPage />} />

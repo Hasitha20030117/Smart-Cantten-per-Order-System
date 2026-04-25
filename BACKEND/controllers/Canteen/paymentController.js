@@ -75,17 +75,20 @@ export const startPayment = async (req, res) => {
 
     const tokenRef = orderData?.tokenRef || `TOKEN-${Date.now().toString().slice(-6)}`;
 
-    const order = await Order.create({
-      studentId: req.user?._id,
-      customerName: orderData?.customerName || null,
-      customerEmail: orderData?.customerEmail || null,
-      sourceOrderId: orderData?.groupId || orderData?._id || null,
-      sourceType: orderData?.source || "canteen-payment",
-      items: normalizedItems,
-      totalAmount: normalizedTotal,
-      tokenRef,
-      status: "PENDING_PAYMENT",
-    });
+    let order = await Order.findOne({ tokenRef });
+    if (!order) {
+      order = await Order.create({
+        studentId: req.user?._id,
+        customerName: orderData?.customerName || null,
+        customerEmail: orderData?.customerEmail || null,
+        sourceOrderId: orderData?.groupId || orderData?._id || null,
+        sourceType: orderData?.source || "canteen-payment",
+        items: normalizedItems,
+        totalAmount: normalizedTotal,
+        tokenRef,
+        status: "PENDING_PAYMENT",
+      });
+    }
 
     const payment = await Payment.create({
       orderId: order._id,
