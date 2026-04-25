@@ -88,6 +88,23 @@ export const startPayment = async (req, res) => {
         tokenRef,
         status: "PENDING_PAYMENT",
       });
+
+      if (req.user?._id) {
+        const User = (await import("../../models/UserManagement/User.js")).default;
+        const user = await User.findById(req.user._id);
+        if (user) {
+          const canteenKey = "Canteen Order";
+          user.rewardPoints.set(canteenKey, (user.rewardPoints.get(canteenKey) || 0) + 1);
+          user.rewardHistory.push({
+            action: 'Earned',
+            points: 1,
+            canteen: canteenKey,
+            amount: normalizedTotal,
+            description: 'Order placed'
+          });
+          await user.save();
+        }
+      }
     }
 
     const payment = await Payment.create({

@@ -70,10 +70,17 @@ const UserSchema = new Schema(
     verificationToken: String,
     verificationTokenExpiresAt: Date,
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
 );
 
 UserSchema.virtual('totalRewardPoints').get(function() {
+  if (this.rewardPoints instanceof Map || (this.rewardPoints && typeof this.rewardPoints.values === 'function')) {
+    return Array.from(this.rewardPoints.values()).reduce((sum, points) => sum + points, 0);
+  }
   return Object.values(this.rewardPoints || {}).reduce((sum, points) => sum + points, 0);
 });
 

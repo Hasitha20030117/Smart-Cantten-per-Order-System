@@ -115,11 +115,11 @@ function App() {
                 ? user?.role === "admin"
                   ? <Navigate to="/admin/dashboard" replace />
                   : <HomePage />
-                : <HomePage />
+                : <Navigate to="/login" replace />
             }
           />
 
-          {/* Public Routes */}
+          {/* Public Auth Routes */}
           <Route
             path="/register"
             element={
@@ -144,34 +144,36 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/admin-quick-access" element={<AdminQuickAccess />} />
-          <Route path="/ContactPage" element={<ContactPage />} />
-          <Route path="/FaqPage" element={<FaqPage />} />
-          <Route path="/AboutUsPage" element={<AboutUsPage />} />
-          <Route path="/canteen" element={<CanteenLanding />} />
-          <Route path="/canteen/pay/:orderId" element={<PayForToken />} />
-          <Route path="/canteen/pay/online/:paymentId" element={<OnlinePay />} />
-          <Route path="/canteen/pay/qr/:paymentId" element={<QrPay />} />
-          <Route path="/canteen/pay/slip/:paymentId" element={<SlipPay />} />
-          <Route path="/canteen/receipt/:paymentId" element={<Receipt />} />
-          <Route path="/canteen/my-payments" element={<MyPayments />} />
-          <Route path="/bulk-order" element={<BulkOrderPage />} />
-          <Route path="/meal-selection/:groupId" element={<MealSelectionPage />} />
-          <Route path="/tokens" element={<TokenGenerationPage />} />
-          <Route path="/subscription" element={<SubscriptionPage />} />
-          <Route path="/orders" element={<OrdersPage />} />
-          <Route path="/orders/create" element={<CreateOrderPage />} />
-          <Route path="/menu/juice-bar" element={<JuiceBar />} />
-          <Route path="/menu/basement" element={<Basement />} />
-          <Route path="/menu/new-canteen" element={<NewCanteen />} />
-          <Route path="/menu/anohana" element={<Anohana />} />
-          <Route path="/menu" element={<JuiceBar />} />
-          <Route path="/breakfast" element={<BreakfastPage />} />
-          <Route path="/lunch" element={<LunchPage />} />
-          <Route path="/snacks" element={<SnacksPage />} />
 
-          {/* Profile - Now Public for Demo */}
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/user-profile" element={<UserProfile />} />
+          {/* Protected App Routes */}
+          <Route path="/ContactPage" element={<CustomerRoute><ContactPage /></CustomerRoute>} />
+          <Route path="/FaqPage" element={<CustomerRoute><FaqPage /></CustomerRoute>} />
+          <Route path="/AboutUsPage" element={<CustomerRoute><AboutUsPage /></CustomerRoute>} />
+          <Route path="/canteen" element={<CustomerRoute><CanteenLanding /></CustomerRoute>} />
+          <Route path="/canteen/pay/:orderId" element={<CustomerRoute><PayForToken /></CustomerRoute>} />
+          <Route path="/canteen/pay/online/:paymentId" element={<CustomerRoute><OnlinePay /></CustomerRoute>} />
+          <Route path="/canteen/pay/qr/:paymentId" element={<CustomerRoute><QrPay /></CustomerRoute>} />
+          <Route path="/canteen/pay/slip/:paymentId" element={<CustomerRoute><SlipPay /></CustomerRoute>} />
+          <Route path="/canteen/receipt/:paymentId" element={<CustomerRoute><Receipt /></CustomerRoute>} />
+          <Route path="/canteen/my-payments" element={<CustomerRoute><MyPayments /></CustomerRoute>} />
+          <Route path="/bulk-order" element={<CustomerRoute><BulkOrderPage /></CustomerRoute>} />
+          <Route path="/meal-selection/:groupId" element={<CustomerRoute><MealSelectionPage /></CustomerRoute>} />
+          <Route path="/tokens" element={<CustomerRoute><TokenGenerationPage /></CustomerRoute>} />
+          <Route path="/subscription" element={<CustomerRoute><SubscriptionPage /></CustomerRoute>} />
+          <Route path="/orders" element={<CustomerRoute><OrdersPage /></CustomerRoute>} />
+          <Route path="/orders/create" element={<CustomerRoute><CreateOrderPage /></CustomerRoute>} />
+          <Route path="/menu/juice-bar" element={<CustomerRoute><JuiceBar /></CustomerRoute>} />
+          <Route path="/menu/basement" element={<CustomerRoute><Basement /></CustomerRoute>} />
+          <Route path="/menu/new-canteen" element={<CustomerRoute><NewCanteen /></CustomerRoute>} />
+          <Route path="/menu/anohana" element={<CustomerRoute><Anohana /></CustomerRoute>} />
+          <Route path="/menu" element={<CustomerRoute><JuiceBar /></CustomerRoute>} />
+          <Route path="/breakfast" element={<CustomerRoute><BreakfastPage /></CustomerRoute>} />
+          <Route path="/lunch" element={<CustomerRoute><LunchPage /></CustomerRoute>} />
+          <Route path="/snacks" element={<CustomerRoute><SnacksPage /></CustomerRoute>} />
+
+          {/* Profile */}
+          <Route path="/profile" element={<CustomerRoute><UserProfile /></CustomerRoute>} />
+          <Route path="/user-profile" element={<CustomerRoute><UserProfile /></CustomerRoute>} />
 
           {/* Admin Routes */}
           <Route

@@ -25,6 +25,22 @@ export const createOrder = async (req, res) => {
       ...(userId && { userId }),
     });
 
+    if (userId) {
+      const user = await User.findById(userId);
+      if (user) {
+        const canteenKey = canteen || 'General';
+        user.rewardPoints.set(canteenKey, (user.rewardPoints.get(canteenKey) || 0) + 1);
+        user.rewardHistory.push({
+          action: 'Earned',
+          points: 1,
+          canteen: canteenKey,
+          amount: totalAmount || 0,
+          description: 'Order placed'
+        });
+        await user.save();
+      }
+    }
+
     res.status(201).json({
       message: "Order placed successfully",
       tokenNumber,

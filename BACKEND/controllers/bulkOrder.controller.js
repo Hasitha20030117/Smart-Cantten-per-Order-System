@@ -52,14 +52,21 @@ export const createEvent = async (req, res) => {
     
     await group.save();
 
-    // Update leader's reward points if earnedRewardPoints > 0
-    if (earnedRewardPoints > 0) {
-      const leader = await User.findOne({ email: leaderEmail.toLowerCase() });
-      if (leader) {
-        const canteenKey = `canteen_${group._id}`;
-        leader.rewardPoints.set(canteenKey, (leader.rewardPoints.get(canteenKey) || 0) + earnedRewardPoints);
-        await leader.save();
-      }
+    // Add 1 reward point for creating the bulk order, plus any earned points
+    const leader = await User.findOne({ email: leaderEmail.toLowerCase() });
+    if (leader) {
+      const canteenKey = 'Bulk Event';
+      const pointsToAdd = 1 + (earnedRewardPoints > 0 ? earnedRewardPoints : 0);
+      
+      leader.rewardPoints.set(canteenKey, (leader.rewardPoints.get(canteenKey) || 0) + pointsToAdd);
+      leader.rewardHistory.push({
+        action: 'Earned',
+        points: pointsToAdd,
+        canteen: canteenKey,
+        amount: 0,
+        description: 'Bulk event created'
+      });
+      await leader.save();
     }
 
     res.status(201).json({ 
